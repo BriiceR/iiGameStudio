@@ -188,6 +188,7 @@ ol.steps2 li::before{content:counter(s);font-family:var(--px);color:var(--lime);
 .home .ico{width:46px;height:46px}
 .home .ghost{background:#22132E}
 .note{margin-top:12px;font-size:13px;color:var(--muted)}
+.link-box{font-size:14px;padding:12px;border-radius:var(--r);background:var(--bg);border:2px dashed var(--line);overflow-wrap:anywhere;margin-bottom:10px;user-select:all;-webkit-user-select:all}
 .allow{display:grid;gap:14px;background:var(--raised);border:1px solid var(--line);border-radius:var(--r-lg);padding:16px;margin-bottom:24px}
 .grp{margin-bottom:22px}
 .grp h2{display:flex;align-items:center;gap:12px;font-size:17px;margin-bottom:4px}
@@ -594,9 +595,9 @@ if(SA)document.documentElement.classList.add('standalone');
 let deferred=null;
 addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferred=e;drawInstall()});
 addEventListener('appinstalled',()=>{deferred=null;drawInstall()});
-const steps=(n,game)=>{const first=game?`Ouvre ${n} avec le bouton ci-dessous.`:null;const s=({iphone:["Ouvre le site dans Safari.","Touche le bouton Partager, le carré avec une flèche vers le haut.",`Choisis « Sur l'écran d'accueil ».`,`Touche « Ajouter » : l'icône ${n} apparaît sur ton écran.`],
+const steps=(n,game)=>{const first=game?(SA?`Copie le lien de ${n} avec le bouton ci-dessous, puis ouvre-le dans ${dev==='iphone'?'Safari':'ton navigateur'}.`:`Ouvre ${n} avec le bouton ci-dessous.`):null;const s=({iphone:["Ouvre le site dans Safari.","Touche le bouton Partager, le carré avec une flèche vers le haut.",`Choisis « Sur l'écran d'accueil ».`,`Touche « Ajouter » : l'icône ${n} apparaît sur ton écran.`],
  android:["Ouvre le site dans Chrome.",`Touche « Installer » en bas de l'écran, ou le menu ⋮ puis « Installer l'application ».`,`Confirme : l'icône ${n} arrive sur ton écran d'accueil.`],
- pc:["Ouvre le site dans Chrome ou Edge.","Clique sur l'icône d'installation à droite de la barre d'adresse.",`Confirme « Installer » : ${n} s'ouvre dans sa propre fenêtre.`]})[dev].slice();if(first)s[0]=first+(dev==='iphone'?' Il doit être ouvert dans Safari.':'');return s};
+ pc:["Ouvre le site dans Chrome ou Edge.","Clique sur l'icône d'installation à droite de la barre d'adresse.",`Confirme « Installer » : ${n} s'ouvre dans sa propre fenêtre.`]})[dev].slice();if(first)s[0]=first+(dev==='iphone'&&!SA?' Il doit être ouvert dans Safari.':'');return s};
 function drawInstall(){
  $('#pick').innerHTML=Object.entries(TARGETS).map(([k,v])=>`<button type="button" data-t="${k}" aria-pressed="${k===target}"><span class="ico">${v.ico}</span><span class="t"><b>${v.name}</b><small>${v.sub}</small></span></button>`).join('');
  $('#dev').innerHTML=Object.entries(DEV).map(([k,v])=>`<button type="button" role="tab" data-d="${k}" aria-selected="${k===dev}">${v}</button>`).join('');
@@ -604,12 +605,15 @@ function drawInstall(){
  $('#howto').innerHTML=steps(TARGETS[target].name,game).map(s=>`<li>${s}</li>`).join('');
  $('#home').innerHTML=`<span><i class="ico">${TARGETS[target].ico}</i>${short[target]}</span>`+'<span><i class="ico ghost"></i>&nbsp;</span>'.repeat(5);
  let h='';
- if(game){h=`<a class="btn wide" href="${GAMES[target].url}">${pi('play')}OUVRIR ${cta[target]}</a><p class="note">Une fois le jeu ouvert, installe-le en suivant les étapes ci-dessus.</p>`}
+ const link=location.origin+(game?GAMES[target].url:'/');
+ if(game&&SA){h=`<p class="note" style="margin:0 0 10px">Tu es dans l'appli du store : pour installer ${TARGETS[target].name} tout seul, ouvre ce lien dans ${dev==='iphone'?'Safari':'ton navigateur'}.</p><p class="link-box">${link}</p><button class="btn wide" type="button" id="copy-btn">COPIER LE LIEN</button><p class="note" id="copy-note" role="status"></p>`}
+ else if(game){h=`<a class="btn wide" href="${GAMES[target].url}">${pi('play')}OUVRIR ${cta[target]}</a><p class="note">Une fois le jeu ouvert, installe-le en suivant les étapes ci-dessus.</p>`}
  else if(SA){h=`<p class="note" style="margin:0">Le store est déjà installé sur cet appareil.</p>`}
  else if(dev==='iphone'){h=`<p class="note" style="margin:0">Sur iPhone, pas de bouton d'installation : suis les étapes ci-dessus.</p>`}
  else if(deferred){h=`<button class="btn wide" type="button" id="inst-btn">${pi('dl')}INSTALLER LE STORE</button>`}
  else{h=`<p class="note" style="margin:0">Si ton navigateur ne propose pas de bouton, suis les étapes ci-dessus. Le store est peut-être déjà installé.</p>`}
  $('#inst-cta').innerHTML=h;
+ const cb=$('#copy-btn');if(cb)cb.onclick=async()=>{try{await navigator.clipboard.writeText(link);$('#copy-note').textContent='Lien copié. Colle-le dans '+(dev==='iphone'?'Safari':'ton navigateur')+'.'}catch(e){$('#copy-note').textContent='Copie impossible : touche le lien et garde le doigt appuyé pour le copier.'}};
  const b=$('#inst-btn');if(b)b.onclick=async()=>{const d=deferred;if(!d)return;deferred=null;d.prompt();try{await d.userChoice}catch(e){}drawInstall()};
 }
 $('#pick').addEventListener('click',e=>{const b=e.target.closest('button');if(b){target=b.dataset.t;drawInstall()}});
@@ -628,10 +632,10 @@ function show(){
   const k=h.slice(10),g=GAMES[k];
   L.classList.add('on');L.classList.remove('done');document.body.style.overflow='hidden';
   $('#launch-shot img').src=IMG[g.img];$('#launch-shot img').alt=g.name;$('#launch-name').textContent=g.name;
-  $('#launch-go').href=g.url;
+  const dest=g.url+(SA?'?store=1':'');$('#launch-go').href=dest;
   const bars=$$('#bar i');bars.forEach(b=>b.classList.remove('f'));let n=0;
   const step=matchMedia('(prefers-reduced-motion: reduce)').matches?60:320;
-  timer=setInterval(()=>{if(n<bars.length){bars[n++].classList.add('f');$('#bar').setAttribute('aria-valuenow',n)}else{clearInterval(timer);L.classList.add('done');history.replaceState(null,'','#jeu-'+k);location.assign(g.url)}},step);
+  timer=setInterval(()=>{if(n<bars.length){bars[n++].classList.add('f');$('#bar').setAttribute('aria-valuenow',n)}else{clearInterval(timer);L.classList.add('done');history.replaceState(null,'','#jeu-'+k);location.assign(dest)}},step);
   return;
  }
  L.classList.remove('on');document.body.style.overflow='';
