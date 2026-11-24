@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#140A1C">
+<title>iiGameStudio</title>
+<meta name="description" content="Les jeux du studio qui n'existe pas. Des jeux web gratuits, à jouer sur téléphone et sur ordi.">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="iiGameStudio">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700&family=Silkscreen&display=swap" rel="stylesheet">
+<style>
+/* VOICE  ludique, borne d'arcade, phrases courtes, tutoiement
+   IDEA   un store d'appli de poche pour un studio qui n'existe pas : barre d'onglets, fiches de jeux, installation
+   PICTURE les vraies captures dans des écrans de téléphone, la bande de blocs pixel, les icônes d'appli
+   COLOUR+TYPE DA iiGameStudio : nuit #140A1C, violet #7E2CA3, lime #C6F24E, jaune #FFD447 ; Silkscreen + Rubik
+   LAYOUT mobile d'abord (390px) ; 600px tablette ; 960px ordinateur, menu en haut, colonnes côte à côte */
+
+/* ===== Jetons ===== */
+:root{
+ color-scheme:dark;
+ --bg:#140A1C;--raised:#22132E;--soft:#2E1A3D;--stage:#1B0F24;--line:#3A2A48;
+ --ink:#F5EFFA;--muted:#A9A0B3;--violet:#7E2CA3;--vtext:#C28CE0;--lime:#C6F24E;--coin:#FFD447;--on-accent:#140A1C;
+ --r:8px;--r-lg:14px;
+ --safe-t:env(safe-area-inset-top,0px);--safe-b:env(safe-area-inset-bottom,0px);
+ --safe-l:env(safe-area-inset-left,0px);--safe-r:env(safe-area-inset-right,0px);
+ --pad:20px;--head:60px;--tab:64px;
+ --px:Silkscreen,"Courier New",monospace;
+}
+:root[data-theme=light]{color-scheme:light;--bg:#FBF8FD;--raised:#FFFFFF;--soft:#EFE6F6;--stage:#EFE6F6;--line:#E3D3EE;--ink:#1E1226;--muted:#6B6275;--vtext:#7E2CA3}
+:root[data-theme=dark]{color-scheme:dark}
+
+/* ===== Base (téléphone) ===== */
+*,*::before,*::after{box-sizing:border-box;min-width:0}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%;scroll-padding-top:calc(var(--head) + var(--safe-t) + 12px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 Rubik,system-ui,sans-serif;overflow-x:clip;-webkit-tap-highlight-color:transparent;padding-bottom:calc(var(--tab) + var(--safe-b));overscroll-behavior-y:none}
+img,svg{display:block;max-width:100%}
+a{color:var(--vtext)}
+h1,h2,h3,p{margin:0}
+.px{font-family:var(--px);font-weight:400}
+.muted{color:var(--muted)}
+.wrap{width:100%;max-width:1200px;margin-inline:auto;padding-inline:calc(var(--pad) + var(--safe-l)) calc(var(--pad) + var(--safe-r))}
+.view{display:none}
+.view.on{display:block;animation:enter .28s ease-out}
+@keyframes enter{from{opacity:0;transform:translateY(8px)}}
+:focus-visible{outline:3px solid var(--lime);outline-offset:3px;border-radius:4px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.wm{width:auto;aspect-ratio:64.6/8;flex:none}
+.pi{width:20px;height:20px;flex:none;shape-rendering:crispEdges}
+
+/* Boutons */
+.btn{font-family:var(--px);font-size:15px;line-height:1;display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:52px;padding:0 22px;border-radius:var(--r);text-decoration:none;background:var(--violet);color:#fff;border:0;cursor:pointer;transition:transform .12s,background .12s;touch-action:manipulation;user-select:none}
+.btn:active{transform:scale(.97)}
+.btn.ghost{background:transparent;color:var(--ink);box-shadow:inset 0 0 0 2px var(--line)}
+.btn.sm{min-height:44px;padding:0 14px;font-size:13px}
+.btn.wide{width:100%}
+.btn .pi{width:16px;height:16px}
+.tag{font-family:var(--px);font-size:11px;line-height:1;padding:5px 7px;border-radius:4px;background:var(--soft);color:var(--ink);display:inline-block;white-space:nowrap}
+.tag.new{background:var(--lime);color:var(--on-accent)}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+
+/* En-tête */
+.top{position:sticky;top:0;z-index:10;padding-top:var(--safe-t);background:color-mix(in srgb,var(--bg) 88%,transparent);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.top .wrap{height:var(--head);display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand{display:flex;align-items:center;gap:10px;color:var(--ink);text-decoration:none;min-height:44px}
+.brand .logo{width:34px;height:34px}
+.brand .wm{height:14px}
+.nav-d{display:none}
+.standalone .hide-sa{display:none}
+
+/* Barre d'onglets (téléphone et tablette) */
+.tabbar{position:fixed;left:0;right:0;bottom:0;z-index:10;height:calc(var(--tab) + var(--safe-b));padding:0 var(--safe-r) var(--safe-b) var(--safe-l);display:grid;grid-template-columns:repeat(4,1fr);background:color-mix(in srgb,var(--bg) 90%,transparent);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border-top:1px solid var(--line)}
+.tabbar a{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;color:var(--muted);text-decoration:none;font-size:11px;font-weight:500;position:relative}
+.tabbar a[aria-current=page]{color:var(--ink)}
+.tabbar a[aria-current=page]::before{content:"";position:absolute;top:0;width:28px;height:3px;background:var(--lime)}
+.tabbar a:active .pi{transform:scale(.88)}
+
+/* Accueil */
+.band-px{display:grid;grid-template-columns:repeat(auto-fill,24px);grid-auto-rows:24px;gap:6px;height:54px;overflow:hidden}
+.band-px i{background:var(--violet)}
+.band-px i.l{background:var(--lime)}.band-px i.y{background:var(--coin)}.band-px i.w{background:var(--ink)}.band-px i.n{background:transparent}
+.hero{padding-block:28px 32px;display:flex;flex-direction:column;gap:22px}
+.eyebrow{font-family:var(--px);font-size:11px;color:var(--lime);margin-bottom:12px}
+.hero h1{font-size:clamp(30px,8.6vw,44px);line-height:1.04;text-wrap:balance}
+.hero p.lead0{margin-top:14px;color:var(--muted);font-size:16px;max-width:46ch}
+.hero .cta{display:grid;gap:10px}
+.sec-h{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-bottom:14px}
+.sec-h h2{font-size:22px;line-height:1.15}
+.sec-h small{color:var(--muted);font-size:13px}
+.feat{background:var(--raised);border:1px solid var(--line);border-radius:var(--r-lg);overflow:hidden}
+.feat .stage{background:var(--stage);display:grid;place-items:center;padding:28px 20px}
+.feat .stage .phone{width:min(190px,52vw)}
+.feat .txt{padding:20px;display:flex;flex-direction:column;gap:12px}
+.feat h2{font-size:26px;line-height:1.1}
+.feat .acts{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;margin-top:4px}
+.link-px{font-family:var(--px);font-size:13px;color:var(--vtext);text-decoration:none;min-height:44px;display:inline-flex;align-items:center;padding-inline:6px}
+.phone{border-radius:10px;overflow:hidden;box-shadow:0 0 0 4px var(--soft),0 16px 36px rgba(0,0,0,.4);background:#17111d;flex:none}
+.phone img{width:100%;height:auto}
+
+/* Liste des jeux : rangées façon store */
+.games{padding-block:36px 8px}
+.grid{display:flex;flex-direction:column;gap:10px}
+.card{position:relative;background:var(--raised);border:1px solid var(--line);border-radius:var(--r-lg);overflow:hidden;color:var(--ink);text-decoration:none;display:flex;flex-direction:column;transition:transform .15s,border-color .15s}
+a.card:active{transform:scale(.985)}
+.card .thumb{display:none}
+.card .body{display:flex;align-items:center;gap:14px;padding:12px 14px}
+.card .meta{flex:1;display:flex;flex-direction:column;gap:4px;align-items:flex-start}
+.card h3{font-family:var(--px);font-weight:400;font-size:15px;line-height:1.25}
+.card p{font-size:13px;line-height:1.35;color:var(--muted)}
+.get{font-family:var(--px);font-size:12px;line-height:1;padding:9px 12px;border-radius:999px;background:var(--soft);color:var(--ink);flex:none}
+a.card .get{background:var(--violet);color:#fff}
+.ico{width:60px;height:60px;border-radius:22%;overflow:hidden;flex:none;background:var(--violet);display:block}
+.ico img,.ico svg{width:100%;height:100%;object-fit:cover}
+.ico.q{background:var(--soft);display:grid;place-items:center;font-family:var(--px);font-size:26px;color:var(--vtext)}
+
+/* Studio */
+.studio{margin-top:36px;background:var(--violet);color:#fff}
+.studio .wrap{padding-block:36px;display:flex;flex-direction:column;gap:20px}
+.studio .logo{width:72px;height:72px;border-radius:12px;box-shadow:0 0 0 3px #fff}
+.studio h2{font-size:22px;line-height:1.3}
+.studio h2 .wm{display:inline-block;height:19px;vertical-align:-2px}
+.studio p{margin-top:10px;font-size:16px;max-width:60ch}
+
+/* Pied de page */
+footer{border-top:1px solid var(--line)}
+footer .wrap{padding-block:24px;display:flex;flex-direction:column;align-items:flex-start;gap:6px;color:var(--muted);font-size:14px}
+footer .wm{height:13px;color:var(--ink)}
+.foot-links{display:flex;flex-wrap:wrap;gap:0 18px}
+.foot-links a{color:var(--muted);text-decoration:none;min-height:44px;display:inline-flex;align-items:center}
+
+/* Fiche d'un jeu */
+.gp{padding-block:12px 28px}
+.back{display:inline-flex;align-items:center;gap:8px;font-family:var(--px);font-size:13px;color:var(--ink);text-decoration:none;min-height:44px}
+.back .pi{width:14px;height:14px}
+.gp-top{display:grid;gap:20px;grid-template-areas:"head" "shots" "info"}
+.gp-head{grid-area:head;display:flex;gap:16px;align-items:center}
+.gp-head .ico{width:84px;height:84px}
+.gp-head h1{font-size:clamp(24px,7vw,34px);line-height:1.05;margin-bottom:8px}
+.shots{grid-area:shots;margin-inline:calc(-1 * var(--pad));background:var(--stage);border-block:1px solid var(--line);padding:20px 0;display:flex;gap:12px;justify-content:center;align-items:center;overflow:hidden}
+.shots .phone{width:30vw;max-width:150px}
+.shots .phone.mid{width:35vw;max-width:172px}
+.gp-info{grid-area:info;display:flex;flex-direction:column;gap:14px}
+.gp-info .lead1{font-size:17px;color:var(--muted)}
+.gp-info .play-d{display:none}
+.gp-info .fine{font-size:13px;color:var(--muted)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font-family:var(--px);font-size:12px;color:var(--ink);text-decoration:none;min-height:44px;display:inline-flex;align-items:center;gap:8px;padding:0 14px;border-radius:999px;box-shadow:inset 0 0 0 2px var(--line)}
+.chip .pi{width:14px;height:14px}
+.gp h2.s{font-size:20px;margin:32px 0 12px}
+.steps{display:grid;gap:10px}
+.step{background:var(--raised);border:1px solid var(--line);border-radius:var(--r-lg);padding:16px;display:grid;grid-template-columns:auto 1fr;gap:4px 14px}
+.step b{font-family:var(--px);font-weight:400;font-size:20px;color:var(--lime);grid-row:span 2;line-height:1.2}
+.step h3{font-size:17px}
+.step p{color:var(--muted);font-size:15px}
+dl{margin:0;display:grid;border-top:1px solid var(--line)}
+dl div{padding:14px 0;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:16px}
+dt{font-family:var(--px);font-size:11px;color:var(--muted);padding-top:3px}
+dd{margin:0;text-align:right}
+.sticky-play{position:sticky;bottom:calc(var(--tab) + var(--safe-b));z-index:5;padding:12px calc(var(--pad) + var(--safe-r)) 12px calc(var(--pad) + var(--safe-l));background:linear-gradient(transparent,var(--bg) 30%)}
+
+/* Pages du store */
+.page{padding-block:12px 32px;max-width:780px}
+.page h1{font-size:clamp(30px,8vw,46px);line-height:1.05;margin:6px 0 10px}
+.lead{font-size:16px;color:var(--muted);max-width:60ch;margin-bottom:24px}
+.label{font-family:var(--px);font-size:11px;color:var(--muted);margin:0 0 10px}
+.pick{display:grid;gap:10px;margin-bottom:24px}
+.pick button{font:inherit;color:var(--ink);background:var(--raised);border:2px solid var(--line);border-radius:var(--r-lg);padding:12px;display:flex;align-items:center;gap:14px;cursor:pointer;text-align:left;touch-action:manipulation}
+.pick button[aria-pressed=true]{border-color:var(--violet);background:var(--soft)}
+.pick button .ico{width:52px;height:52px}
+.pick span.t{display:flex;flex-direction:column;gap:4px}
+.pick b{font-family:var(--px);font-weight:400;font-size:14px;line-height:1.25}
+.pick small{color:var(--muted);font-size:13px}
+.seg{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;padding:4px;background:var(--raised);border:1px solid var(--line);border-radius:var(--r);margin-bottom:14px}
+.seg button{font-family:var(--px);font-size:12px;color:var(--muted);background:transparent;border:0;border-radius:6px;min-height:44px;cursor:pointer}
+.seg button[aria-selected=true]{background:var(--violet);color:#fff}
+.howto{display:grid;gap:20px}
+ol.steps2{margin:0;padding:0;list-style:none;counter-reset:s;display:grid;gap:8px}
+ol.steps2 li{counter-increment:s;display:flex;gap:14px;align-items:flex-start;background:var(--raised);border:1px solid var(--line);border-radius:var(--r);padding:14px 16px}
+ol.steps2 li::before{content:counter(s);font-family:var(--px);color:var(--lime);font-size:17px;line-height:1.35;flex:none;width:16px}
+.home{width:190px;justify-self:center;background:#0b0610;border-radius:24px;padding:18px 14px 22px;box-shadow:0 0 0 4px var(--soft);display:grid;grid-template-columns:repeat(3,1fr);gap:14px 8px;justify-items:center}
+.home span{display:flex;flex-direction:column;align-items:center;gap:6px;font-size:10.5px;color:#F5EFFA;line-height:1.2;text-align:center}
+.home .ico{width:46px;height:46px}
+.home .ghost{background:#22132E}
+.note{margin-top:12px;font-size:13px;color:var(--muted)}
+.allow{display:grid;gap:14px;background:var(--raised);border:1px solid var(--line);border-radius:var(--r-lg);padding:16px;margin-bottom:24px}
+.grp{margin-bottom:22px}
+.grp h2{display:flex;align-items:center;gap:12px;font-size:17px;margin-bottom:4px}
+.grp h2 .ico{width:34px;height:34px}
+.opt{display:flex;gap:16px;align-items:center;padding:14px 0;border-bottom:1px solid var(--line)}
+.opt div{flex:1}
+.opt b{display:block;font-weight:500}
+.opt small{color:var(--muted);font-size:14px}
+.sw{width:52px;height:32px;border-radius:16px;background:var(--line);border:0;position:relative;cursor:pointer;flex:none;touch-action:manipulation}
+.sw::after{content:"";position:absolute;top:4px;left:4px;width:24px;height:24px;border-radius:12px;background:#fff;transition:transform .18s}
+.sw[aria-checked=true]{background:var(--lime)}
+.sw[aria-checked=true]::after{transform:translateX(20px);background:var(--on-accent)}
+.sw:disabled{opacity:.4;cursor:not-allowed}
+.legal h2{font-size:18px;margin:28px 0 8px}
+.legal p{color:var(--muted);max-width:66ch}
+
+
+/* Avis */
+.rate{display:inline-flex;align-items:center;gap:5px;font-size:12px;color:var(--muted)}
+.rate .pi{width:12px;height:12px;color:var(--coin)}
+.rate b{color:var(--ink);font-weight:500}
+.rate-chip{font:inherit;background:none;border:0;padding:0;margin-top:8px;cursor:pointer;min-height:32px;display:inline-flex;align-items:center}
+.stars{display:inline-flex;gap:2px;color:var(--line)}
+.stars .pi{width:13px;height:13px}
+.stars .on{color:var(--coin)}
+.rv-sum{display:grid;grid-template-columns:auto 1fr;gap:20px;align-items:center;background:var(--raised);border:1px solid var(--line);border-radius:var(--r-lg);padding:18px}
+.rv-avg{text-align:center}
+.rv-avg strong{display:block;font-family:var(--px);font-weight:400;font-size:42px;line-height:1}
+.rv-avg small{display:block;color:var(--muted);font-size:12px;margin-top:6px}
+.rv-bars{display:grid;gap:5px}
+.rv-bar{display:grid;grid-template-columns:12px 1fr 24px;gap:8px;align-items:center;font-size:12px;color:var(--muted)}
+.rv-bar i{display:block;height:8px;background:var(--soft);border-radius:4px;overflow:hidden}
+.rv-bar i span{display:block;height:100%;background:var(--coin)}
+.rv-bar em{font-style:normal;text-align:right}
+.rv-form{margin-top:14px;background:var(--raised);border:1px solid var(--line);border-radius:var(--r-lg);padding:16px;display:grid;gap:12px}
+.rv-form h3{font-size:16px}
+.pickstars{display:flex;gap:4px;border:0;margin:0;padding:0}
+.pickstars label{width:44px;height:44px;display:grid;place-items:center;color:var(--line);cursor:pointer;border-radius:var(--r)}
+.pickstars label .pi{width:26px;height:26px}
+.pickstars label.on{color:var(--coin)}
+.pickstars input:focus-visible+label{outline:3px solid var(--lime);outline-offset:1px}
+.rv-form textarea{font:inherit;font-size:16px;color:var(--ink);background:var(--bg);border:2px solid var(--line);border-radius:var(--r);padding:12px;min-height:96px;resize:vertical;width:100%}
+.rv-form textarea:focus{outline:none;border-color:var(--violet)}
+.rv-form .foot{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.rv-form .count{font-size:12px;color:var(--muted)}
+.rv-msg{font-size:14px;color:var(--muted)}
+.rv-msg.err{color:#FF5C7A}
+.rv-list{margin-top:14px;display:grid;gap:10px}
+.rv{background:var(--raised);border:1px solid var(--line);border-radius:var(--r-lg);padding:14px 16px;display:grid;gap:6px}
+.rv-top{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.rv-who{font-weight:500}
+.rv-date{font-size:12px;color:var(--muted)}
+.rv p{color:var(--ink);font-size:15px;white-space:pre-line;overflow-wrap:anywhere}
+.rv-acts{display:flex;gap:4px}
+.rv-acts button{font:inherit;font-size:13px;color:var(--vtext);background:none;border:0;cursor:pointer;min-height:44px;padding:0 8px}
+.rv.mine{border-color:var(--violet)}
+.rv-empty{text-align:center;padding:28px 16px;color:var(--muted);background:var(--raised);border:1px dashed var(--line);border-radius:var(--r-lg)}
+
+
+/* Admin */
+.adm-lock{text-align:center;padding:60px 20px;color:var(--muted)}
+.adm-tabs{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;padding:4px;background:var(--raised);border:1px solid var(--line);border-radius:var(--r);margin:4px 0 20px}
+.adm-tabs::-webkit-scrollbar{display:none}
+.adm-tabs button{flex:1 0 auto;font-family:var(--px);font-size:12px;color:var(--muted);background:transparent;border:0;border-radius:6px;min-height:44px;padding:0 14px;cursor:pointer;white-space:nowrap}
+.adm-tabs button[aria-selected=true]{background:var(--violet);color:#fff}
+.sample{font-size:12px;color:var(--muted);margin:0 0 12px}
+.kpis{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:20px}
+.kpi{background:var(--raised);border:1px solid var(--line);border-radius:var(--r-lg);padding:14px}
+.kpi small{display:block;font-size:12px;color:var(--muted)}
+.kpi strong{display:block;font-family:var(--px);font-weight:400;font-size:28px;line-height:1.1;margin-top:6px}
+.kpi em{font-style:normal;font-size:12px;color:var(--lime)}
+.panel{background:var(--raised);border:1px solid var(--line);border-radius:var(--r-lg);padding:16px;margin-bottom:16px}
+.panel h3{font-size:15px;margin-bottom:12px}
+.cols{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;align-items:end;height:140px}
+.cols div{display:flex;flex-direction:column;align-items:center;gap:6px;height:100%;justify-content:flex-end}
+.cols i{display:block;width:100%;max-width:28px;background:var(--violet);border-radius:3px 3px 0 0}
+.cols i.l{background:var(--lime)}
+.cols span{font-size:11px;color:var(--muted)}
+.hb{display:grid;gap:10px}
+.hb-row{display:grid;grid-template-columns:110px 1fr auto;gap:10px;align-items:center;font-size:14px}
+.hb-row i{display:block;height:10px;background:var(--soft);border-radius:5px;overflow:hidden}
+.hb-row i span{display:block;height:100%;background:var(--violet)}
+.hb-row b{font-weight:500;font-variant-numeric:tabular-nums}
+.mod{display:grid;gap:10px}
+.mod .rv{grid-template-columns:1fr}
+.mod .rv.hidden{opacity:.6;border-style:dashed}
+.mod .game{font-family:var(--px);font-size:11px;color:var(--vtext)}
+.field{display:grid;gap:6px;margin-bottom:12px}
+.field span{font-size:13px;color:var(--muted)}
+.field input,.field select,.field textarea{font:inherit;font-size:16px;color:var(--ink);background:var(--bg);border:2px solid var(--line);border-radius:var(--r);padding:11px 12px;width:100%}
+.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--violet)}
+.two{display:grid;gap:0 12px}
+.lock{background:#0b0610;border-radius:22px;padding:22px 14px;box-shadow:0 0 0 4px var(--soft);max-width:320px}
+.lock .time{text-align:center;font-size:40px;font-weight:300;color:#F5EFFA;margin-bottom:16px}
+.toast{display:flex;gap:10px;align-items:flex-start;background:rgba(255,255,255,.12);border-radius:16px;padding:10px 12px;color:#F5EFFA}
+.toast .ico{width:36px;height:36px}
+.toast b{display:block;font-size:13px}.toast p{font-size:13px;color:#d8d0e0;overflow-wrap:anywhere}
+.toast small{font-size:11px;color:#A9A0B3}
+.hist{display:grid;gap:8px;margin-top:12px}
+.hist div{display:flex;justify-content:space-between;gap:12px;font-size:14px;border-bottom:1px solid var(--line);padding-bottom:8px}
+.gl{display:grid;gap:10px}
+.gi{display:grid;grid-template-columns:auto 1fr;gap:10px 14px;align-items:center;background:var(--raised);border:1px solid var(--line);border-radius:var(--r-lg);padding:12px}
+.gi .ico{width:52px;height:52px}
+.gi h3{font-family:var(--px);font-weight:400;font-size:14px}
+.gi .ctl{grid-column:1/-1;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.gi select{font:inherit;font-size:15px;color:var(--ink);background:var(--bg);border:2px solid var(--line);border-radius:var(--r);padding:0 10px;min-height:44px}
+.icon-btn{width:44px;height:44px;border-radius:var(--r);border:2px solid var(--line);background:transparent;color:var(--ink);font-size:18px;cursor:pointer}
+.al-row{display:flex;gap:12px;align-items:center;padding:14px 0;border-bottom:1px solid var(--line)}
+.al-row div{flex:1}.al-row b{display:block;font-weight:500}.al-row small{color:var(--muted);font-size:14px}
+.al-row .pv{font:inherit;font-size:13px;color:var(--vtext);background:none;border:0;cursor:pointer;min-height:44px;padding:0 6px}
+.al-grid{display:flex;flex-direction:column;gap:16px}.al-pv{order:-1;position:sticky;top:calc(var(--head) + var(--safe-t) + 8px);z-index:2;background:var(--bg);padding-bottom:8px}
+.al-pv .lock{max-width:none;padding:12px;border-radius:16px}.al-pv .lock .time{display:none}
+.al-badge{display:inline-block;font-family:var(--px);font-size:10px;padding:3px 6px;border-radius:4px;background:#FF5C7A;color:#140A1C;margin-left:6px;vertical-align:2px}
+.times{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.times input{font:inherit;font-size:16px;color:var(--ink);background:var(--bg);border:2px solid var(--line);border-radius:var(--r);padding:8px 10px;min-height:44px}
+.adm-link{color:var(--line)!important}
+
+/* Écran de lancement */
+.launch{position:fixed;inset:0;z-index:30;background:#140A1C;color:#F5EFFA;display:none;flex-direction:column;align-items:center;justify-content:center;gap:20px;padding:calc(24px + var(--safe-t)) 24px calc(24px + var(--safe-b));text-align:center;overflow:hidden}
+.launch.on{display:flex}
+.launch .logo{width:112px;height:112px}
+.launch .wm{height:22px}
+.bar{display:flex;gap:5px}.bar i{width:16px;height:16px;background:#2E1A3D}.bar i.f{background:#C6F24E}
+.launch .loading{display:contents}
+.launch .ready{display:none;flex-direction:column;align-items:center;gap:16px;max-width:380px}
+.launch.done .loading{display:none}
+.launch.done .ready{display:flex}
+.launch .ready .phone{width:min(190px,50vw)}
+.corner{position:absolute;display:grid;grid-template-columns:repeat(4,28px);grid-auto-rows:28px;gap:7px}
+.corner i{background:#7E2CA3}.corner i.l{background:#C6F24E}
+
+/* ===== Tablette : 600px et plus ===== */
+@media (min-width:600px){
+ :root{--pad:32px}
+ .band-px{grid-template-columns:repeat(auto-fill,32px);grid-auto-rows:32px;gap:8px;height:112px}
+ .hero{padding-block:48px 40px}
+ .hero .cta{display:flex;flex-wrap:wrap}
+ .sec-h h2{font-size:28px}
+ .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+ .card .thumb{display:grid;place-items:center;height:200px;background:var(--stage)}
+ .card .thumb .phone{width:96px;box-shadow:0 0 0 3px var(--soft)}
+ .card .thumb.q span{font-family:var(--px);font-size:64px;color:var(--vtext)}
+ .card .body{padding:16px}
+ .card .ico{width:48px;height:48px}
+ .studio .wrap{flex-direction:row;align-items:center;gap:32px;padding-block:52px}
+ .studio .logo{width:104px;height:104px}
+ .studio h2{font-size:28px}.studio h2 .wm{height:24px;vertical-align:-3px}
+ .steps{grid-template-columns:repeat(3,minmax(0,1fr))}
+ .step{grid-template-columns:1fr}.step b{grid-row:auto}
+ dl{grid-template-columns:repeat(2,minmax(0,1fr));column-gap:32px}
+ .shots{margin-inline:0;border:1px solid var(--line);border-radius:var(--r-lg)}
+ .shots .phone{width:150px;max-width:none}.shots .phone.mid{width:176px;max-width:none}
+ .pick{grid-template-columns:repeat(3,minmax(0,1fr))}
+ .pick button{flex-direction:column;text-align:center;padding:16px 10px}
+ .seg{max-width:420px}
+ .howto{grid-template-columns:1fr 200px;align-items:start}
+ .home{justify-self:end}
+ .allow{grid-template-columns:1fr auto;align-items:center}
+ footer .wrap{flex-direction:row;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 24px}
+}
+
+/* ===== Ordinateur : 960px et plus ===== */
+@media (min-width:960px){
+ :root{--head:72px}
+ body{padding-bottom:0}
+ .tabbar{display:none}
+ .brand .logo{width:40px;height:40px}.brand .wm{height:17px}
+ .nav-d{display:flex;align-items:center;gap:4px}
+ .nav-d a:not(.btn){font-family:var(--px);font-size:13px;color:var(--ink);text-decoration:none;padding:0 14px;min-height:44px;display:inline-flex;align-items:center;border-radius:var(--r)}
+ .nav-d a[aria-current=page]:not(.btn){color:var(--lime)}
+ .hero{flex-direction:row;align-items:flex-end;justify-content:space-between;padding-block:64px 56px}
+ .hero h1{font-size:64px;max-width:13ch}
+ .hero p.lead0{font-size:18px}
+ .feat{display:grid;grid-template-columns:1.1fr 1fr}
+ .feat .stage{padding:44px}.feat .stage .phone{width:230px}
+ .feat .txt{padding:48px;justify-content:center;gap:16px}
+ .feat h2{font-size:40px}
+ .feat .acts{display:flex}
+ .games{padding-top:64px}
+ .grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:20px}
+ .studio{margin-top:64px}
+ .gp{padding-block:24px 72px}
+ .gp-top{grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);grid-template-areas:"shots head" "shots info";column-gap:48px;row-gap:20px;align-items:start}
+ .gp-head{align-self:end}
+ .gp-head .ico{width:96px;height:96px}
+ .gp-head h1{font-size:46px}
+ .shots{padding:44px 0}
+ .shots .phone{width:170px}.shots .phone.mid{width:200px}
+ .gp-info .play-d{display:inline-flex;align-self:flex-start;min-height:64px;padding:0 44px;font-size:20px}
+ .sticky-play{display:none}
+ .gp h2.s{font-size:26px;margin-top:56px}
+ .kpis{grid-template-columns:repeat(4,minmax(0,1fr))}
+ .adm-grid{display:grid;grid-template-columns:1.4fr 1fr;gap:16px;align-items:start}
+ .two{grid-template-columns:1fr 1fr}
+ .al-grid{display:grid;grid-template-columns:1fr 320px;gap:24px;align-items:start}.al-pv{order:0;padding:0}.al-pv .lock{padding:22px 14px;border-radius:22px}.al-pv .lock .time{display:block}
+ .notif-grid{display:grid;grid-template-columns:1fr 320px;gap:24px;align-items:start}
+ .rv-zone{display:grid;grid-template-columns:minmax(0,340px) minmax(0,1fr);gap:24px;align-items:start}
+ .rv-zone .rv-form,.rv-zone .rv-list{margin-top:0}
+ .rv-left{display:grid;gap:14px;position:sticky;top:calc(var(--head) + 20px)}
+}
+
+/* Survol seulement avec une souris */
+@media (hover:hover){
+ .btn:hover{background:#8f37b6}.btn.ghost:hover{background:var(--soft)}
+ a.card:hover{transform:translateY(-4px);border-color:var(--violet)}
+ .nav-d a:not(.btn):hover{background:var(--soft)}
+ .foot-links a:hover{color:var(--ink)}
+}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<symbol id="logo" viewBox="0 0 500 500"><rect width="500" height="500" rx="48" fill="#7E2CA3"/><path fill="#fff" d="M57 201H112V251H57ZM56 265H111V388H56ZM127 201H182V251H127ZM126 265H181V388H126ZM277 112H444V167H277ZM222 167H277V333H222ZM332 222H444V278H332ZM388 278H444V333H388ZM277 333H388V388H277Z"/></symbol>
+<symbol id="wm" viewBox="0 0 64.6 8"><path fill="currentColor" d="M0 1h1v1h-1zM0 3h1v1h-1zM0 4h1v1h-1zM0 5h1v1h-1zM0 6h1v1h-1zM0 7h1v1h-1zM2.6 1h1v1h-1zM2.6 3h1v1h-1zM2.6 4h1v1h-1zM2.6 5h1v1h-1zM2.6 6h1v1h-1zM2.6 7h1v1h-1zM6.2 0h1v1h-1zM7.2 0h1v1h-1zM8.2 0h1v1h-1zM5.2 1h1v1h-1zM9.2 1h1v1h-1zM5.2 2h1v1h-1zM5.2 3h1v1h-1zM5.2 4h1v1h-1zM7.2 4h1v1h-1zM8.2 4h1v1h-1zM9.2 4h1v1h-1zM5.2 5h1v1h-1zM9.2 5h1v1h-1zM5.2 6h1v1h-1zM9.2 6h1v1h-1zM6.2 7h1v1h-1zM7.2 7h1v1h-1zM8.2 7h1v1h-1zM12.8 3h1v1h-1zM13.8 3h1v1h-1zM14.8 3h1v1h-1zM15.8 4h1v1h-1zM12.8 5h1v1h-1zM13.8 5h1v1h-1zM14.8 5h1v1h-1zM15.8 5h1v1h-1zM11.8 6h1v1h-1zM15.8 6h1v1h-1zM12.8 7h1v1h-1zM13.8 7h1v1h-1zM14.8 7h1v1h-1zM15.8 7h1v1h-1zM18.4 3h1v1h-1zM19.4 3h1v1h-1zM20.4 3h1v1h-1zM21.4 3h1v1h-1zM18.4 4h1v1h-1zM20.4 4h1v1h-1zM22.4 4h1v1h-1zM18.4 5h1v1h-1zM20.4 5h1v1h-1zM22.4 5h1v1h-1zM18.4 6h1v1h-1zM20.4 6h1v1h-1zM22.4 6h1v1h-1zM18.4 7h1v1h-1zM20.4 7h1v1h-1zM22.4 7h1v1h-1zM26.0 3h1v1h-1zM27.0 3h1v1h-1zM28.0 3h1v1h-1zM25.0 4h1v1h-1zM29.0 4h1v1h-1zM25.0 5h1v1h-1zM26.0 5h1v1h-1zM27.0 5h1v1h-1zM28.0 5h1v1h-1zM29.0 5h1v1h-1zM25.0 6h1v1h-1zM26.0 7h1v1h-1zM27.0 7h1v1h-1zM28.0 7h1v1h-1zM32.6 0h1v1h-1zM33.6 0h1v1h-1zM34.6 0h1v1h-1zM31.6 1h1v1h-1zM35.6 1h1v1h-1zM31.6 2h1v1h-1zM32.6 3h1v1h-1zM33.6 3h1v1h-1zM34.6 3h1v1h-1zM35.6 4h1v1h-1zM35.6 5h1v1h-1zM31.6 6h1v1h-1zM35.6 6h1v1h-1zM32.6 7h1v1h-1zM33.6 7h1v1h-1zM34.6 7h1v1h-1zM39.2 1h1v1h-1zM39.2 2h1v1h-1zM38.2 3h1v1h-1zM39.2 3h1v1h-1zM40.2 3h1v1h-1zM41.2 3h1v1h-1zM39.2 4h1v1h-1zM39.2 5h1v1h-1zM39.2 6h1v1h-1zM40.2 7h1v1h-1zM41.2 7h1v1h-1zM43.8 3h1v1h-1zM47.8 3h1v1h-1zM43.8 4h1v1h-1zM47.8 4h1v1h-1zM43.8 5h1v1h-1zM47.8 5h1v1h-1zM43.8 6h1v1h-1zM46.8 6h1v1h-1zM47.8 6h1v1h-1zM44.8 7h1v1h-1zM45.8 7h1v1h-1zM47.8 7h1v1h-1zM54.4 0h1v1h-1zM54.4 1h1v1h-1zM54.4 2h1v1h-1zM51.4 3h1v1h-1zM52.4 3h1v1h-1zM53.4 3h1v1h-1zM54.4 3h1v1h-1zM50.4 4h1v1h-1zM54.4 4h1v1h-1zM50.4 5h1v1h-1zM54.4 5h1v1h-1zM50.4 6h1v1h-1zM54.4 6h1v1h-1zM51.4 7h1v1h-1zM52.4 7h1v1h-1zM53.4 7h1v1h-1zM54.4 7h1v1h-1zM57.0 1h1v1h-1zM57.0 3h1v1h-1zM57.0 4h1v1h-1zM57.0 5h1v1h-1zM57.0 6h1v1h-1zM57.0 7h1v1h-1zM60.6 3h1v1h-1zM61.6 3h1v1h-1zM62.6 3h1v1h-1zM59.6 4h1v1h-1zM63.6 4h1v1h-1zM59.6 5h1v1h-1zM63.6 5h1v1h-1zM59.6 6h1v1h-1zM63.6 6h1v1h-1zM60.6 7h1v1h-1zM61.6 7h1v1h-1zM62.6 7h1v1h-1z"/></symbol>
+<symbol id="i-home" viewBox="0 0 8 8"><path fill="currentColor" d="M3 0h2v1h-2zM2 1h4v1h-4zM1 2h6v1h-6zM0 3h8v1h-8zM1 4h6v1h-6zM1 5h2v1h-2zM5 5h2v1h-2zM1 6h2v1h-2zM5 6h2v1h-2zM1 7h2v1h-2zM5 7h2v1h-2z"/></symbol>
+<symbol id="i-grid" viewBox="0 0 8 8"><path fill="currentColor" d="M0 0h3v1h-3zM5 0h3v1h-3zM0 1h3v1h-3zM5 1h3v1h-3zM0 2h3v1h-3zM5 2h3v1h-3zM0 5h3v1h-3zM5 5h3v1h-3zM0 6h3v1h-3zM5 6h3v1h-3zM0 7h3v1h-3zM5 7h3v1h-3z"/></symbol>
+<symbol id="i-info" viewBox="0 0 8 8"><path fill="currentColor" d="M3 0h2v1h-2zM3 1h2v1h-2zM2 3h3v1h-3zM3 4h2v1h-2zM3 5h2v1h-2zM3 6h2v1h-2zM2 7h4v1h-4z"/></symbol>
+<symbol id="i-bell" viewBox="0 0 8 8"><path fill="currentColor" d="M3 0h2v1h-2zM2 1h4v1h-4zM1 2h6v1h-6zM1 3h6v1h-6zM1 4h6v1h-6zM0 5h8v1h-8zM3 7h2v1h-2z"/></symbol>
+<symbol id="i-dl" viewBox="0 0 8 8"><path fill="currentColor" d="M3 0h2v1h-2zM3 1h2v1h-2zM3 2h2v1h-2zM1 3h6v1h-6zM2 4h4v1h-4zM3 5h2v1h-2zM0 6h1v1h-1zM7 6h1v1h-1zM0 7h8v1h-8z"/></symbol>
+<symbol id="i-back" viewBox="0 0 8 8"><path fill="currentColor" d="M3 0h1v1h-1zM2 1h2v1h-2zM1 2h7v1h-7zM0 3h8v1h-8zM1 4h7v1h-7zM2 5h2v1h-2zM3 6h1v1h-1z"/></symbol>
+<symbol id="i-play" viewBox="0 0 8 8"><path fill="currentColor" d="M0 0h2v1h-2zM0 1h4v1h-4zM0 2h6v1h-6zM0 3h8v1h-8zM0 4h8v1h-8zM0 5h6v1h-6zM0 6h4v1h-4zM0 7h2v1h-2z"/></symbol>
+<symbol id="i-star" viewBox="0 0 8 8"><path fill="currentColor" d="M3 0h2v1h-2zM3 1h2v1h-2zM2 2h4v1h-4zM0 3h8v1h-8zM1 4h6v1h-6zM2 5h4v1h-4zM1 6h6v1h-6zM0 7h2v1h-2zM6 7h2v1h-2z"/></symbol>
+</defs></svg>
+
+<header class="top"><div class="wrap">
+<a class="brand" href="#accueil" aria-label="iiGameStudio, accueil"><svg class="logo" viewBox="0 0 500 500" aria-hidden="true"><use href="#logo"/></svg><svg class="wm" viewBox="0 0 64.6 8" shape-rendering="crispEdges" aria-hidden="true"><use href="#wm"/></svg></a>
+<nav class="nav-d" aria-label="Navigation principale">
+<a href="#jeux" data-nav="jeux">JEUX</a>
+<a href="#studio" data-nav="studio">LE STUDIO</a>
+</nav>
+<a href="#installer" class="btn sm hide-sa"><svg class="pi" viewBox="0 0 8 8" aria-hidden="true"><use href="#i-dl"/></svg>INSTALLER</a>
+</div></header>
+
+<main id="main">
+<!-- ACCUEIL -->
+<div class="view" id="v-accueil">
+<div class="band-px" aria-hidden="true" id="band"></div>
+<section class="wrap hero">
+<div>
+<p class="eyebrow">Jeux web gratuits · téléphone et ordi</p>
+<h1 class="px">Les jeux du studio qui n'existe pas.</h1>
+<p class="lead0">Des jeux courts et un peu absurdes, jouables direct dans ton navigateur. Pas de compte, pas de pub.</p>
+</div>
+<div class="cta"><a class="btn" href="#jeux">VOIR LES JEUX</a><a class="btn ghost hide-sa" href="#installer"><svg class="pi" viewBox="0 0 8 8" aria-hidden="true"><use href="#i-dl"/></svg>INSTALLER L'APPLI</a></div>
+</section>
+
+<section class="wrap" aria-labelledby="une">
+<div class="feat">
+<div class="stage"><div class="phone"><img data-img="ntd-menu" alt="Menu principal de Nine Tiles Dungeon"></div></div>
+<div class="txt">
+<div class="row"><span class="tag new">À LA UNE</span><span class="tag">JOUABLE</span></div>
+<h2 id="une" class="px">Nine Tiles Dungeon</h2>
+<p class="muted">Un donjon de neuf cases, des monstres, des coffres et beaucoup de malchance. Tu meurs, tu recommences, tu descends un peu plus bas.</p>
+<p class="muted" style="font-size:13px">Die and retry · 5 chapitres · mode sans fin</p>
+<div class="acts"><a class="btn" href="#lancement-ntd"><svg class="pi" viewBox="0 0 8 8" aria-hidden="true"><use href="#i-play"/></svg>JOUER</a><a href="#jeu-ntd" class="link-px">EN SAVOIR PLUS</a></div>
+</div>
+</div>
+</section>
+
+<section class="wrap games" id="jeux-section" aria-labelledby="jeux-t">
+<div class="sec-h"><h2 id="jeux-t" class="px">Les jeux</h2><small>2 jouables · 3 en développement</small></div>
+<div class="grid" id="grid"></div>
+</section>
+
+<section class="studio" id="studio-section" aria-labelledby="studio-t"><div class="wrap">
+<svg class="logo" viewBox="0 0 500 500" aria-hidden="true"><use href="#logo"/></svg>
+<div><h2 id="studio-t" class="px">C'est quoi <svg class="wm" viewBox="0 0 64.6 8" shape-rendering="crispEdges" role="img" aria-label="iiGameStudio"><use href="#wm"/></svg> ?</h2>
+<p>Un studio qui n'existe pas vraiment. C'est l'étiquette de toutes mes idées de jeux : certaines sont jouables, d'autres pas encore. Tout est gratuit, et ça bouge souvent.</p></div>
+</div></section>
+</div>
+
+<!-- FICHES JEU -->
+<div class="view" id="v-jeu-ntd"></div>
+<div class="view" id="v-jeu-vertical"></div>
+
+<!-- INSTALLER -->
+<div class="view" id="v-installer"><div class="wrap page">
+<a class="back" href="#accueil"><svg class="pi" viewBox="0 0 8 8" aria-hidden="true"><use href="#i-back"/></svg>ACCUEIL</a>
+<h1 class="px">Installer</h1>
+<p class="lead">Pas obligatoire : tout se joue dans le navigateur. Installé, ça s'ouvre en plein écran, sans barre d'adresse, et ta progression est mieux gardée.</p>
+<p class="label" id="pick-l">QUOI INSTALLER</p>
+<div class="pick" id="pick" role="group" aria-labelledby="pick-l"></div>
+<p class="label" id="dev-l">TON APPAREIL</p>
+<div class="seg" role="tablist" aria-labelledby="dev-l" id="dev"></div>
+<div class="howto">
+<div style="display:grid;gap:16px"><ol class="steps2" id="howto"></ol><div id="inst-cta"></div></div>
+<div class="home" aria-label="Aperçu de ton écran d'accueil" id="home"></div>
+</div>
+</div></div>
+
+<!-- CONFIDENTIALITE -->
+<div class="view" id="v-confidentialite"><div class="wrap page legal">
+<a class="back" href="#accueil"><svg class="pi" viewBox="0 0 8 8" aria-hidden="true"><use href="#i-back"/></svg>ACCUEIL</a>
+<h1 class="px">Confidentialité</h1>
+<p class="lead">En bref : pas de compte, pas de pub, pas de suivi. Ta progression reste sur ton appareil.</p>
+<h2>Ce qu'on collecte</h2>
+<p>Rien. Le site ne pose aucun cookie, ne compte pas les visites et ne demande aucune information personnelle. Comme pour tout site, l'hébergeur garde des journaux techniques de connexion pour faire fonctionner le service et le protéger.</p>
+<h2>Ce qui reste sur ton appareil</h2>
+<p>Ta progression dans les jeux (niveaux, pièces, records, réglages) est enregistrée dans ton navigateur ou dans l'appli installée. Elle ne quitte pas ton téléphone ou ton ordinateur. Pour l'effacer, supprime les données du site dans ton navigateur, ou désinstalle l'appli.</p>
+<h2>Publicité et achats</h2>
+<p>Il n'y a ni publicité ni achat. Si ça change un jour, cette page sera mise à jour avant.</p>
+<h2>Éditeur</h2>
+<p>iiGameStudio, projet personnel non professionnel. Contact : <a href="mailto:iigamestudio@gmail.com">iigamestudio@gmail.com</a></p>
+<h2>Hébergement</h2>
+<p>Vercel Inc., 440 N Barranca Ave #4133, Covina, CA 91723, États-Unis.</p>
+</div></div>
+
+
+</main>
+
+<footer><div class="wrap">
+<svg class="wm" viewBox="0 0 64.6 8" shape-rendering="crispEdges" role="img" aria-label="iiGameStudio"><use href="#wm"/></svg>
+<nav class="foot-links" aria-label="Liens utiles"><a href="#installer">Installer</a><a href="#confidentialite">Confidentialité</a><a href="mailto:iigamestudio@gmail.com">Contact</a></nav>
+<span>Les jeux du studio qui n'existe pas.</span>
+</div></footer>
+
+<nav class="tabbar" aria-label="Onglets">
+<a href="#accueil" data-tab="accueil"><svg class="pi" viewBox="0 0 8 8" aria-hidden="true"><use href="#i-home"/></svg>Accueil</a>
+<a href="#jeux" data-tab="jeux"><svg class="pi" viewBox="0 0 8 8" aria-hidden="true"><use href="#i-grid"/></svg>Jeux</a>
+<a href="#studio" data-tab="studio"><svg class="pi" viewBox="0 0 8 8" aria-hidden="true"><use href="#i-info"/></svg>Studio</a>
+<a href="#installer" data-tab="installer"><svg class="pi" viewBox="0 0 8 8" aria-hidden="true"><use href="#i-dl"/></svg>Installer</a>
+</nav>
+
+<!-- LANCEMENT -->
+<div class="launch" id="launch" role="dialog" aria-modal="true" aria-label="Lancement du jeu">
+<div class="corner" style="top:0;right:-7px" aria-hidden="true"><i style="grid-column:2/span 3"></i><i style="grid-column:1;grid-row:2"></i><i style="grid-column:3/span 2;grid-row:2"></i><i style="grid-column:4;grid-row:3"></i></div>
+<div class="corner" style="bottom:0;left:-7px" aria-hidden="true"><i style="grid-column:1;grid-row:1"></i><i style="grid-column:1/span 2;grid-row:2"></i><i class="l" style="grid-column:4;grid-row:2"></i><i style="grid-column:1/span 3;grid-row:3"></i></div>
+<div class="loading">
+<svg class="logo" viewBox="0 0 500 500" aria-hidden="true"><use href="#logo"/></svg>
+<svg class="wm" viewBox="0 0 64.6 8" shape-rendering="crispEdges" role="img" aria-label="iiGameStudio"><use href="#wm"/></svg>
+<p class="px" style="font-size:12px;color:#A9A0B3">PRÉSENTE</p>
+<div class="bar" id="bar" role="progressbar" aria-label="Chargement" aria-valuemin="0" aria-valuemax="5" aria-valuenow="0"><i></i><i></i><i></i><i></i><i></i></div>
+</div>
+<div class="ready">
+<div class="phone" id="launch-shot"><img alt=""></div>
+<p class="px" style="font-size:18px" id="launch-name"></p>
+<a class="btn wide" id="launch-go" href="/ntd/">C'EST PARTI</a>
+</div>
+</div>
+
+<script>
+const IMG={'ntd-titre':'/img/ntd-titre.webp','ntd-menu':'/img/ntd-menu.webp','ntd-carte':'/img/ntd-carte.webp','vertical-jeu':'/img/vertical-jeu.webp','icon-ntd':'/img/icon-ntd.svg','icon-vertical':'/img/icon-slime.svg'};
+{
+const GAMES={
+ ntd:{url:'/ntd/',name:'Nine Tiles Dungeon',tag:'JOUABLE',short:'Die and retry de donjon sur neuf cases.',img:'ntd-titre',icon:'icon-ntd',shots:['ntd-menu','ntd-titre','ntd-carte'],
+  lead:"Neuf cases. Cinq niveaux. Beaucoup de morts. Des monstres, des coffres qui cachent des pouvoirs, et un donjon qui ne pardonne rien.",
+  kind:'DIE AND RETRY',
+  steps:[["Avance case par case","Chaque coup compte. Pas d'aperçu : c'est à toi d'anticiper."],["Ouvre les coffres","Dix pouvoirs à trouver : foudre, glace, aimant, sangsue…"],["Bats les gardiens","Cinq chapitres de dix niveaux, un gardien au bout de chacun."]],
+  facts:[['GENRE','Die and retry, donjon'],['CONTENU','5 chapitres, défi du jour, mode sans fin'],['OÙ JOUER','Navigateur, téléphone ou ordi'],['PRIX','Gratuit']]},
+ vertical:{url:'/slime/',name:'Slime Vertical',tag:'JOUABLE',short:'Saute, ramasse les pièces, monte le plus haut possible.',img:'vertical-jeu',icon:'icon-vertical',shots:['vertical-jeu','vertical-jeu','vertical-jeu'],
+  lead:"Un slime bleu, des plates-formes au hasard et un seul but : monter. Si tu sors de l'écran, c'est fini. Ton score, c'est ta hauteur.",
+  kind:'PLATE-FORME',
+  steps:[["Saute de plate-forme en plate-forme","Gauche, droite, saut. Les plates-formes sont toujours atteignables… de justesse."],["Ramasse les pièces","Elles restent à toi même quand tu tombes."],["Dépense-les au magasin","Cœur, saut plus grand, vitesse, fusée : de quoi battre ton record."]],
+  facts:[['GENRE','Plate-forme verticale'],['SCORE','La hauteur atteinte, record gardé'],['OÙ JOUER','Navigateur, téléphone ou ordi'],['PRIX','Gratuit']]}
+};
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const pi=n=>`<svg class="pi" viewBox="0 0 8 8" aria-hidden="true"><use href="#i-${n}"/></svg>`;
+const phone=(k,cls='')=>`<div class="phone ${cls}"><img src="${IMG[k]}" alt="" loading="lazy"></div>`;
+const ico=k=>`<span class="ico"><img src="${IMG[k]}" alt=""></span>`;
+
+// bande pixel
+const pat=['v','v','v','v','v','v','n','v','n','v','n','w','w','w','w','n','l','l','n','v','v','v','v','v','v','v','v','v','n','v','n','y','n','v','v','v'];
+$('#band').innerHTML=Array.from({length:150},(_,i)=>{const r=Math.floor(i/50),c=i%50,t=pat[(c+r*7)%pat.length];return `<i class="${t==='v'?'':t}"></i>`}).join('');
+
+// liste des jeux
+const card=k=>{const g=GAMES[k];return `<a class="card" href="#jeu-${k}"><div class="thumb" aria-hidden="true">${phone(g.img)}</div><div class="body">${ico(g.icon)}<div class="meta"><h3>${g.name}</h3><p>${g.short}</p></div><span class="get" aria-hidden="true">JOUER</span></div></a>`};
+const mys=`<div class="card mys"><div class="thumb q" aria-hidden="true"><span>?</span></div><div class="body"><span class="ico q" aria-hidden="true">?</span><div class="meta"><h3>???</h3><p>En développement. On n'en dit pas plus.</p></div><span class="get" aria-hidden="true">BIENTÔT</span></div></div>`;
+$('#grid').innerHTML=card('ntd')+card('vertical')+mys+mys+mys;
+
+// fiches jeu
+for(const k in GAMES){const g=GAMES[k];
+ $('#v-jeu-'+k).innerHTML=`<div class="gp wrap">
+ <a class="back" href="#jeux">${pi('back')}TOUS LES JEUX</a>
+ <div class="gp-top">
+  <div class="gp-head">${ico(g.icon)}<div><h1 class="px">${g.name}</h1><div class="row"><span class="tag new">${g.tag}</span><span class="tag">${g.kind}</span></div></div></div>
+  <div class="shots" aria-label="Captures du jeu">${g.shots.map((s,i)=>phone(s,i===1?'mid':'')).join('')}</div>
+  <div class="gp-info">
+   <p class="lead1">${g.lead}</p>
+   <a class="btn play-d" href="#lancement-${k}">${pi('play')}JOUER</a>
+   <p class="fine">Gratuit · sans pub · sans compte · téléphone et ordi</p>
+   <div class="chips"><a class="chip" href="#installer-${k}">${pi('dl')}INSTALLER CE JEU</a></div>
+  </div>
+ </div>
+ <h2 class="px s">Comment ça marche</h2>
+ <div class="steps">${g.steps.map((s,i)=>`<div class="step"><b>0${i+1}</b><h3>${s[0]}</h3><p>${s[1]}</p></div>`).join('')}</div>
+ <h2 class="px s">Fiche du jeu</h2>
+ <dl>${g.facts.map(f=>`<div><dt>${f[0]}</dt><dd>${f[1]}</dd></div>`).join('')}</dl>
+ </div>
+ <div class="sticky-play"><a class="btn wide" href="#lancement-${k}">${pi('play')}JOUER</a></div>`;
+}
+$$('img[data-img]').forEach(i=>i.src=IMG[i.dataset.img]);
+
+// installer
+const TARGETS={store:{name:'iiGameStudio',sub:'Tous les jeux',ico:'<svg viewBox="0 0 500 500" aria-hidden="true"><use href="#logo"/></svg>'},
+ ntd:{name:'Nine Tiles Dungeon',sub:'Le jeu seul',ico:`<img src="${IMG['icon-ntd']}" alt="">`},
+ vertical:{name:'Slime Vertical',sub:'Le jeu seul',ico:`<img src="${IMG['icon-vertical']}" alt="">`}};
+const short={store:'iiGameStudio',ntd:'NTD',vertical:'Slime'};
+const cta={store:'LE STORE',ntd:'NTD',vertical:'SLIME VERTICAL'};
+const DEV={iphone:'iPhone',android:'Android',pc:'Ordi'};
+const ua=navigator.userAgent;let dev=/iPhone|iPad/.test(ua)?'iphone':/Android/.test(ua)?'android':'pc',target='store';
+const SA=matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;
+if(SA)document.documentElement.classList.add('standalone');
+let deferred=null;
+addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferred=e;drawInstall()});
+addEventListener('appinstalled',()=>{deferred=null;drawInstall()});
+const steps=(n,game)=>{const first=game?`Ouvre ${n} avec le bouton ci-dessous.`:null;const s=({iphone:["Ouvre le site dans Safari.","Touche le bouton Partager, le carré avec une flèche vers le haut.",`Choisis « Sur l'écran d'accueil ».`,`Touche « Ajouter » : l'icône ${n} apparaît sur ton écran.`],
+ android:["Ouvre le site dans Chrome.",`Touche « Installer » en bas de l'écran, ou le menu ⋮ puis « Installer l'application ».`,`Confirme : l'icône ${n} arrive sur ton écran d'accueil.`],
+ pc:["Ouvre le site dans Chrome ou Edge.","Clique sur l'icône d'installation à droite de la barre d'adresse.",`Confirme « Installer » : ${n} s'ouvre dans sa propre fenêtre.`]})[dev].slice();if(first)s[0]=first+(dev==='iphone'?' Il doit être ouvert dans Safari.':'');return s};
+function drawInstall(){
+ $('#pick').innerHTML=Object.entries(TARGETS).map(([k,v])=>`<button type="button" data-t="${k}" aria-pressed="${k===target}"><span class="ico">${v.ico}</span><span class="t"><b>${v.name}</b><small>${v.sub}</small></span></button>`).join('');
+ $('#dev').innerHTML=Object.entries(DEV).map(([k,v])=>`<button type="button" role="tab" data-d="${k}" aria-selected="${k===dev}">${v}</button>`).join('');
+ const game=target!=='store';
+ $('#howto').innerHTML=steps(TARGETS[target].name,game).map(s=>`<li>${s}</li>`).join('');
+ $('#home').innerHTML=`<span><i class="ico">${TARGETS[target].ico}</i>${short[target]}</span>`+'<span><i class="ico ghost"></i>&nbsp;</span>'.repeat(5);
+ let h='';
+ if(game){h=`<a class="btn wide" href="${GAMES[target].url}">${pi('play')}OUVRIR ${cta[target]}</a><p class="note">Une fois le jeu ouvert, installe-le en suivant les étapes ci-dessus.</p>`}
+ else if(SA){h=`<p class="note" style="margin:0">Le store est déjà installé sur cet appareil.</p>`}
+ else if(dev==='iphone'){h=`<p class="note" style="margin:0">Sur iPhone, pas de bouton d'installation : suis les étapes ci-dessus.</p>`}
+ else if(deferred){h=`<button class="btn wide" type="button" id="inst-btn">${pi('dl')}INSTALLER LE STORE</button>`}
+ else{h=`<p class="note" style="margin:0">Si ton navigateur ne propose pas de bouton, suis les étapes ci-dessus. Le store est peut-être déjà installé.</p>`}
+ $('#inst-cta').innerHTML=h;
+ const b=$('#inst-btn');if(b)b.onclick=async()=>{const d=deferred;if(!d)return;deferred=null;d.prompt();try{await d.userChoice}catch(e){}drawInstall()};
+}
+$('#pick').addEventListener('click',e=>{const b=e.target.closest('button');if(b){target=b.dataset.t;drawInstall()}});
+$('#dev').addEventListener('click',e=>{const b=e.target.closest('button');if(b){dev=b.dataset.d;drawInstall()}});
+
+// navigation
+let timer=null,prev='';
+function setTab(t){
+ $$('.tabbar a').forEach(a=>{if(a.dataset.tab===t)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current')});
+ $$('.nav-d a[data-nav]').forEach(a=>{if(a.dataset.nav===t)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current')});
+}
+function show(){
+ const h=(location.hash||'#accueil').slice(1);
+ const L=$('#launch');clearInterval(timer);
+ if(h.startsWith('lancement-')&&GAMES[h.slice(10)]){
+  const k=h.slice(10),g=GAMES[k];
+  L.classList.add('on');L.classList.remove('done');document.body.style.overflow='hidden';
+  $('#launch-shot img').src=IMG[g.img];$('#launch-shot img').alt=g.name;$('#launch-name').textContent=g.name;
+  $('#launch-go').href=g.url;
+  const bars=$$('#bar i');bars.forEach(b=>b.classList.remove('f'));let n=0;
+  const step=matchMedia('(prefers-reduced-motion: reduce)').matches?60:320;
+  timer=setInterval(()=>{if(n<bars.length){bars[n++].classList.add('f');$('#bar').setAttribute('aria-valuenow',n)}else{clearInterval(timer);L.classList.add('done');history.replaceState(null,'','#jeu-'+k);location.assign(g.url)}},step);
+  return;
+ }
+ L.classList.remove('on');document.body.style.overflow='';
+ let view=h,scroll=null,tab=h;
+ if(h==='jeux'){view='accueil';scroll='#jeux-section'}
+ if(h==='studio'){view='accueil';scroll='#studio-section'}
+ if(h.startsWith('jeu-'))tab='jeux';
+ if(h.startsWith('installer-')&&TARGETS[h.slice(10)]){target=h.slice(10);view='installer'}
+ else if(h==='installer')target='store';
+ if(view==='installer'){drawInstall();tab='installer'}
+ if(!document.getElementById('v-'+view)){view='accueil';tab='accueil'}
+ if(view==='accueil'&&!scroll)tab='accueil';
+ setTab(tab);
+ $$('.view').forEach(v=>v.classList.toggle('on',v.id==='v-'+view));
+ if(scroll)requestAnimationFrame(()=>$(scroll).scrollIntoView({behavior:'smooth'}));
+ else if(view!==prev)window.scrollTo(0,0);
+ prev=view;
+}
+addEventListener('hashchange',show);show();
+addEventListener('keydown',e=>{if(e.key==='Escape'&&$('#launch').classList.contains('on'))history.back()});
+addEventListener('pageshow',e=>{if(e.persisted)show()});
+if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('/sw.js',{scope:'/'}).catch(()=>{}));
+}
+</script>
+</body>
+</html>
