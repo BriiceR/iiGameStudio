@@ -479,6 +479,54 @@ body:not(.is-admin) .adm-only{display:none!important}
  .adm .games2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
  .adm .games2 .adm-box{margin-bottom:0}
 }
+/* ===== Compte joueur (V2) ===== */
+.ava{display:block;flex:0 0 auto}
+.rv-who{display:inline-flex;align-items:center;gap:8px}
+.pf{background:var(--raised);border:1px solid var(--line);border-radius:var(--r-lg);padding:18px;display:grid;gap:16px;margin-bottom:12px}
+.pf-top{display:flex;gap:16px;align-items:center}
+.pf-av{width:76px;height:76px;flex:0 0 76px;border-radius:14px;background:var(--stage);display:grid;place-items:center;box-shadow:inset 0 0 0 2px var(--line)}
+.pf-id{display:flex;flex-direction:column;gap:4px;min-width:0}
+.pf-id h2{font-family:var(--px);font-weight:400;font-size:22px;line-height:1.2;overflow-wrap:anywhere}
+.pf-id p{font-size:13px;color:var(--muted)}
+.pf-id .atag{align-self:flex-start;margin:2px 0 0}
+.pf form{display:grid;gap:12px}
+.pf label.lb,.pf legend{font-size:13px;color:var(--muted);padding:0;margin-bottom:6px}
+.pf fieldset{border:0;margin:0;padding:0;min-width:0}
+.pf input[type=text]{font:inherit;font-size:16px;color:var(--ink);background:var(--bg);border:2px solid var(--line);border-radius:var(--r);padding:12px;width:100%}
+.pf input[type=text]:focus{outline:none;border-color:var(--violet)}
+.ava-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.ava-grid button{aspect-ratio:1;min-height:56px;display:grid;place-items:center;background:var(--stage);border:2px solid var(--line);border-radius:12px;cursor:pointer;padding:0}
+.ava-grid button[aria-pressed=true]{border-color:var(--vtext);box-shadow:0 0 0 2px var(--vtext)}
+.pf .row2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.tiles div{background:var(--stage);border:1px solid var(--line);border-radius:var(--r-lg);padding:14px 8px;text-align:center}
+.tiles b{display:block;font-family:var(--px);font-weight:400;font-size:22px;line-height:1.2;color:var(--vtext)}
+.tiles span{display:block;font-size:12px;color:var(--muted);margin-top:4px}
+.acc-h{font-family:var(--px);font-weight:400;font-size:18px;margin:28px 0 12px}
+.mg{display:grid;gap:10px}
+.mg article{background:var(--raised);border:1px solid var(--line);border-radius:var(--r-lg);padding:16px;display:grid;gap:14px}
+.mg .hd{display:flex;gap:14px;align-items:center}
+.mg .hd img{width:56px;height:56px;border-radius:12px;display:block}
+.mg .hd h3{font-size:17px;line-height:1.25}
+.mg .hd p{font-size:13px;color:var(--muted);margin-top:2px}
+.mg .ft{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.mg .ft a:not(.btn){font-size:14px;color:var(--vtext)}
+.mg .ft .btn{min-height:44px}
+.mg .mine{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted)}
+.acc-list{background:var(--raised);border:1px solid var(--line);border-radius:var(--r-lg);display:flex;flex-direction:column;margin-bottom:12px}
+.acc-list>*{min-height:56px;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;border-top:1px solid var(--line);color:var(--ink);text-decoration:none;font:inherit;font-size:15px;background:none;border-left:0;border-right:0;border-bottom:0;text-align:left;width:100%;cursor:pointer}
+.acc-list>*:first-child{border-top:0}
+.acc-list .k{display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:2px;cursor:default}
+.acc-list .k small{font-size:12px;color:var(--muted)}
+.acc-list .k span{overflow-wrap:anywhere}
+.acc-list .chev{color:var(--muted);font-size:20px}
+.btn.danger{background:transparent;color:#FF5C7A;box-shadow:inset 0 0 0 2px color-mix(in srgb,#FF5C7A 45%,var(--bg))}
+:root[data-theme=light] .btn.danger{color:#C2183D}
+.del-box{background:color-mix(in srgb,#FF5C7A 10%,var(--bg));border:1px solid color-mix(in srgb,#FF5C7A 45%,var(--bg));border-radius:var(--r-lg);padding:16px;display:grid;gap:12px}
+.del-box p{font-size:14px}
+.del-box .row2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.del-box .btn{min-height:48px;font-size:13px}
+.btn.red{background:#D7264A;color:#fff}
 </style>
 </head>
 <body>
@@ -587,7 +635,7 @@ body:not(.is-admin) .adm-only{display:none!important}
 <h2>Ce qu'on mesure</h2>
 <p>Le site compte les visites et les parties pour savoir quels jeux plaisent. Pour chaque événement (visite, partie lancée, installation, temps de jeu), on garde le jeu concerné, le type d'appareil (iPhone, Android ou ordinateur, site ou appli installée) et l'heure. Chaque visite reçoit un numéro tiré au hasard, oublié dès que tu fermes l'onglet : on ne peut pas te reconnaître d'une visite à l'autre. Il n'y a ni cookie ni outil de mesure extérieur. Comme pour tout site, l'hébergeur garde aussi des journaux techniques de connexion pour faire fonctionner le service et le protéger.</p>
 <h2>Ton compte, si tu en crées un</h2>
-<p>On garde ton adresse e-mail (pour t'envoyer ton code de connexion), ton pseudo, tes notes et tes avis, et les parties que tu lances quand tu es connecté. Tes avis sont publics avec ton pseudo ; ton adresse e-mail n'est jamais affichée. Pour supprimer ton compte et tout ce qui va avec, écris à <a href="mailto:iigamestudio@gmail.com">iigamestudio@gmail.com</a>.</p>
+<p>On garde ton adresse e-mail (pour t'envoyer ton code de connexion), ton pseudo, tes notes et tes avis, et les parties que tu lances quand tu es connecté. Tes avis sont publics avec ton pseudo et ton avatar ; ton adresse e-mail n'est jamais affichée. Dans l'onglet Compte, tu peux télécharger tes données et supprimer ton compte en un bouton : ton e-mail, ton pseudo et tes avis sont alors effacés, et tes parties restent dans les statistiques sans aucun lien avec toi.</p>
 <h2>Ce qui reste sur ton appareil</h2>
 <p>Ta progression dans les jeux (niveaux, pièces, records, réglages) et ta connexion au compte sont enregistrées dans ton navigateur ou dans l'appli installée. Pour les effacer, supprime les données du site dans ton navigateur, ou désinstalle l'appli.</p>
 <h2>Publicité et achats</h2>
@@ -737,8 +785,8 @@ try{if(window.supabase)S.sb=window.supabase.createClient(SB_URL,SB_KEY,{auth:{pe
 
 async function loadProfile(){
  if(!S.sb||!uid()){S.profile=null;syncAdmin();return}
- const {data}=await S.sb.from('profiles').select('display_name,role').eq('id',uid()).maybeSingle();
- S.profile=data||{display_name:'Joueur',role:'player'};
+ const {data}=await S.sb.from('profiles').select('display_name,role,avatar,created_at').eq('id',uid()).maybeSingle();
+ S.profile=data||{display_name:'Joueur',role:'player',avatar:'slime-lime'};
  syncAdmin();
 }
 async function loadStats(){
@@ -750,7 +798,7 @@ async function loadStats(){
 async function loadReviews(k){
  if(!S.sb){drawReviews(k);return}
  const db=GAMES[k].db;
- const {data,error}=await S.sb.from('reviews').select('id,game_id,user_id,rating,comment,status,created_at,profiles(display_name)').eq('game_id',db).order('created_at',{ascending:false}).limit(50);
+ const {data,error}=await S.sb.from('reviews').select('id,game_id,user_id,rating,comment,status,created_at,profiles(display_name,avatar)').eq('game_id',db).order('created_at',{ascending:false}).limit(50);
  S.loaded[k]=error?'err':true;S.reviews[k]=data||[];drawReviews(k);
 }
 function drawRates(){
@@ -780,7 +828,7 @@ function drawReviews(k,force){
   ${S.msg[k]?`<p class="rv-msg${S.msg[k].err?' err':''}" role="status">${esc(S.msg[k].t)}</p>`:''}</form>`;
  }
  list.innerHTML=all.length?all.map(r=>{const me=r.user_id===uid();const who=me?'Toi':(r.profiles?.display_name||'Un joueur');const rep=S.report===r.id;
-  return `<article class="rv${me?' mine':''}"><div class="rv-top"><span class="rv-who">${esc(who)}</span>${starRow(r.rating)}</div><span class="rv-date">${new Date(r.created_at).toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'})}${r.status==='masque'?' · masqué':''}</span>${r.comment?`<p>${esc(r.comment)}</p>`:''}
+  return `<article class="rv${me?' mine':''}"><div class="rv-top"><span class="rv-who">${avaSvg(r.profiles?.avatar,20)}${esc(who)}</span>${starRow(r.rating)}</div><span class="rv-date">${new Date(r.created_at).toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'})}${r.status==='masque'?' · masqué':''}</span>${r.comment?`<p>${esc(r.comment)}</p>`:''}
   ${!me&&uid()?`<div class="rv-acts">${S.reported[r.id]?'<span class="rv-msg" style="font-size:13px;padding:12px 8px">Merci, c\'est signalé.</span>':rep?`<span class="rv-msg" style="font-size:13px;padding:12px 8px">Signaler cet avis ?</span><button type="button" class="warn" data-act="rep-yes" data-k="${k}" data-id="${r.id}">Oui</button><button type="button" data-act="rep-no" data-k="${k}">Non</button>`:`<button type="button" data-act="rep" data-k="${k}" data-id="${r.id}">Signaler</button>`}</div>`:''}</article>`}).join(''):`<div class="rv-empty">Aucun avis pour l'instant. Sois le premier à noter ${esc(GAMES[k].name)}.</div>`;
 }
 function drawAllReviews(){drawRates();Object.keys(GAMES).forEach(k=>drawReviews(k))}
@@ -789,14 +837,7 @@ function drawAllReviews(){drawRates();Object.keys(GAMES).forEach(k=>drawReviews(
 function drawAccount(){
  const el=$('#acct');if(!el)return;
  if(!S.sb){el.innerHTML='<div class="rv-empty">La connexion n\'est pas disponible pour le moment.</div>';return}
- if(uid()){
-  const p=S.profile||{display_name:'Joueur'};
-  el.innerHTML=`<div class="acct-card"><h2>Ton pseudo</h2><p class="rv-msg">C'est le nom affiché sur tes avis.${p.display_name==='Joueur'?' Choisis-en un !':''}</p>
-  <form id="name-f" novalidate style="display:grid;gap:10px"><label class="sr" for="name-in">Pseudo</label><input id="name-in" class="field-in" maxlength="40" value="${esc(p.display_name)}" autocomplete="nickname" style="font:inherit;font-size:16px;color:var(--ink);background:var(--bg);border:2px solid var(--line);border-radius:var(--r);padding:12px"><button class="btn" type="submit">ENREGISTRER</button><p class="rv-msg" id="name-msg" role="status"></p></form></div>
-  ${S.profile?.role==='admin'?`<a class="adm-alert" href="#admin" style="margin-bottom:16px;background:var(--raised);border-color:var(--line)"><svg class="pi" viewBox="0 0 8 8" aria-hidden="true" style="color:var(--vtext)"><use href="#i-chart"/></svg><span><b>Espace admin</b>Tableau de bord, modération, joueurs</span><span aria-hidden="true" style="flex:0;font-size:20px">›</span></a>`:''}<div class="acct-card"><h2>Connexion</h2><p class="rv-msg">Connecté avec ${esc(S.session.user.email)}.</p><button class="btn ghost" type="button" id="logout">SE DÉCONNECTER</button></div>
-  <p class="note">Pour supprimer ton compte et tes avis, écris à <a href="mailto:iigamestudio@gmail.com">iigamestudio@gmail.com</a>.</p>`;
-  return;
- }
+ if(uid()){drawLoggedIn(el);return}
  const L=S.login;
  if(L.step==='email'){
   el.innerHTML=`<p class="lead">Un compte sert à noter les jeux et laisser des avis. Pas de mot de passe : on t'envoie un e-mail.</p>
@@ -850,7 +891,7 @@ document.addEventListener('click',async e=>{
 if(S.sb){
  S.sb.auth.onAuthStateChange((ev,session)=>{
   S.session=session;
-  setTimeout(async()=>{await loadProfile();S.authReady=true;drawAccount();if((location.hash||'').startsWith('#admin'))openAdmin();drawAllReviews();Object.keys(GAMES).forEach(k=>{if(S.loaded[k])loadReviews(k)});
+  setTimeout(async()=>{await loadProfile();S.authReady=true;if(uid())loadMine();else Object.assign(M,{games:null,reviews:[],edit:false,ava:null,del:false});drawAccount();if((location.hash||'').startsWith('#admin'))openAdmin();drawAllReviews();Object.keys(GAMES).forEach(k=>{if(S.loaded[k])loadReviews(k)});
    if(ev==='SIGNED_IN'){S.login={step:'email',email:'',busy:false,msg:null};let fromLink=false;try{fromLink=sessionStorage.getItem('iig-login')==='1';sessionStorage.removeItem('iig-login')}catch(_){}if(fromLink&&location.hash!=='#compte')location.hash='#compte'}
    const nc=$('#nav-compte');if(nc)nc.textContent=uid()?(S.profile?.display_name||'Compte').slice(0,16):'COMPTE';
   },0);
@@ -859,13 +900,14 @@ if(S.sb){
 }
 
 // ---- V2 : espace admin (tableau de bord, modération, joueurs)
-const A={period:'7d',me:false,stats:null,err:null,loading:false,rv:null,reps:{},rvErr:null,flt:'sig',fg:'all',players:null,plErr:null,busy:{},pending:0};
+const A={avas:{},period:'7d',me:false,stats:null,err:null,loading:false,rv:null,reps:{},rvErr:null,flt:'sig',fg:'all',players:null,plErr:null,busy:{},pending:0};
 const isAdmin=()=>S.profile?.role==='admin';
 const GBY={};Object.keys(GAMES).forEach(k=>GBY[GAMES[k].db]={k,name:GAMES[k].name,icon:IMG[GAMES[k].icon]||''});
 const nf=n=>Number(n||0).toLocaleString('fr-FR');
 const dur=s=>{s=Math.round(s||0);if(s<60)return s+' s';if(s<3600)return Math.round(s/60)+' min';const h=Math.floor(s/3600),m=Math.round((s%3600)/60);return h+' h'+(m?' '+String(m).padStart(2,'0'):'')};
 const ago=t=>{if(!t)return'jamais';const d=(Date.now()-new Date(t))/1000;if(d<60)return"à l'instant";if(d<3600)return'il y a '+Math.round(d/60)+' min';if(d<86400)return'il y a '+Math.round(d/3600)+' h';const j=Math.round(d/86400);if(j===1)return'hier';if(j<30)return'il y a '+j+' jours';return'le '+new Date(t).toLocaleDateString('fr-FR',{day:'numeric',month:'short',year:'numeric'})};
 const day=t=>new Date(t).toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'});
+const avBox=(id,av,off)=>av&&!off?`<span class="av" style="background:var(--stage);display:grid;place-items:center" aria-hidden="true">${avaSvg(av,22)}</span>`:`<span class="av" style="background:${off?'var(--line)':avCol(id)}" aria-hidden="true"></span>`;
 const avCol=id=>['#C6F24E','#FFD447','#C28CE0','#7E2CA3','#5EC8E0','#FF8FA3'][[...String(id)].reduce((a,c)=>a+c.charCodeAt(0),0)%6];
 function delta(c,p){if(!p)return c?{t:'nouveau',up:true}:{t:'',up:false};const v=Math.round((c-p)/p*100);return{t:(v>0?'+':'')+v+' % vs avant',up:v>0}}
 
@@ -881,15 +923,19 @@ async function refreshPending(){
  if(!error){A.pending=new Set((data||[]).map(r=>r.review_id)).size;setAdminBadge()}
 }
 
+async function loadAvas(ids){
+ ids=ids.filter(i=>!(i in A.avas));if(!ids.length)return;
+ const {data}=await S.sb.from('profiles').select('id,avatar').in('id',ids);(data||[]).forEach(x=>A.avas[x.id]=x.avatar);
+}
 async function loadAdminStats(){
  A.loading=true;A.err=null;drawAdmin();
  const {data,error}=await S.sb.rpc('admin_stats',{p_period:A.period,p_me:A.me});
- A.loading=false;if(error){A.err=error.message}else{A.stats=data;A.pending=data.reported;setAdminBadge()}
+ A.loading=false;if(error){A.err=error.message}else{A.stats=data;A.pending=data.reported;setAdminBadge();await loadAvas((data.recent||[]).map(x=>x.id))}
  drawAdmin();
 }
 async function loadAdminReviews(){
  const [r,p]=await Promise.all([
-  S.sb.from('reviews').select('id,game_id,user_id,rating,comment,status,created_at,updated_at,profiles(display_name)').order('created_at',{ascending:false}).limit(300),
+  S.sb.from('reviews').select('id,game_id,user_id,rating,comment,status,created_at,updated_at,profiles(display_name,avatar)').order('created_at',{ascending:false}).limit(300),
   S.sb.from('review_reports').select('review_id,reason,created_at')
  ]);
  if(r.error||p.error){A.rvErr=(r.error||p.error).message;drawAdmin();return}
@@ -898,7 +944,7 @@ async function loadAdminReviews(){
 }
 async function loadAdminPlayers(){
  const {data,error}=await S.sb.rpc('admin_players');
- A.plErr=error?error.message:null;A.players=data||[];drawAdmin();
+ A.plErr=error?error.message:null;A.players=data||[];await loadAvas(A.players.map(x=>x.id));drawAdmin();
 }
 
 function chartSvg(series,hourly){
@@ -925,7 +971,7 @@ function drawBord(){
  const kp=(t,n,e,up)=>`<div class="kpi"><small>${t}</small><strong>${n}</strong><em${up?' class="up"':''}>${e||'&nbsp;'}</em></div>`;
  const alert=s.reported?`<a class="adm-alert" href="#admin-avis"><svg class="pi" viewBox="0 0 8 8" aria-hidden="true"><use href="#i-bell"/></svg><span><b>${s.reported} avis signalé${s.reported>1?'s':''}</b>À regarder dans la modération</span><span aria-hidden="true" style="flex:0;font-size:20px;color:var(--coin)">›</span></a>`:'';
  const games=(s.games||[]).map(g=>{const m=GBY[g.id]||{name:g.id,icon:''};return `<article class="adm-box gstat"><div class="hd">${m.icon?`<img src="${m.icon}" alt="">`:''}<h3>${esc(m.name)}</h3>${g.rating?`<b>★ ${fmt(g.rating)}</b>`:''}</div><div class="cells"><div><b>${nf(g.launches)}</b><span>parties</span></div><div><b>${nf(g.players)}</b><span>sessions</span></div><div><b>${dur(g.play_s)}</b><span>de jeu</span></div><div><b>${nf(g.reviews)}</b><span>avis</span></div></div></article>`}).join('');
- const recent=(s.recent||[]).map(p=>`<li><span class="av" style="background:${avCol(p.id)}" aria-hidden="true"></span><span class="nm">${esc(p.name)}${p.role==='admin'?'<span class="atag">ADMIN</span>':''}</span><span class="rt">${ago(p.created_at)}</span></li>`).join('');
+ const recent=(s.recent||[]).map(p=>`<li>${avBox(p.id,A.avas[p.id])}<span class="nm">${esc(p.name)}${p.role==='admin'?'<span class="atag">ADMIN</span>':''}</span><span class="rt">${ago(p.created_at)}</span></li>`).join('');
  return seg+alert+`<div class="kpis" aria-busy="${A.loading}">
  ${kp('Visites',nf(s.visits),v.t,v.up)}
  ${kp('Parties lancées',nf(s.launches),l.t,l.up)}
@@ -956,7 +1002,7 @@ function drawAvis(){
  const card=r=>{const reps=A.reps[r.id]||[],hid=r.status==='masque',g=GBY[r.game_id],b=A.busy[r.id];
   const acts=hid?`<button class="btn ghost" type="button" data-adm-act="show" data-id="${r.id}"${b?' disabled':''}>RÉAFFICHER</button>`
    :`<button class="btn" type="button" data-adm-act="hide" data-id="${r.id}"${b?' disabled':''}>MASQUER</button>${reps.length?`<button class="btn ghost" type="button" data-adm-act="keep" data-id="${r.id}"${b?' disabled':''}>GARDER</button>`:''}`;
-  return `<article class="${reps.length?'sig':''}${hid?' off':''}"><div class="hd"><span class="av" style="background:${hid?'var(--line)':avCol(r.user_id)}" aria-hidden="true"></span><span>${esc(r.profiles?.display_name||'Joueur')}<small>${esc(g?g.name:r.game_id)} · ${ago(r.created_at)}</small></span>${hid?'<span class="atag" style="background:var(--line);color:var(--ink)">MASQUÉ</span>':`<b style="color:var(--coin);font-weight:500">★ ${r.rating}</b>`}</div>
+  return `<article class="${reps.length?'sig':''}${hid?' off':''}"><div class="hd">${avBox(r.user_id,r.profiles?.avatar,hid)}<span>${esc(r.profiles?.display_name||'Joueur')}<small>${esc(g?g.name:r.game_id)} · ${ago(r.created_at)}</small></span>${hid?'<span class="atag" style="background:var(--line);color:var(--ink)">MASQUÉ</span>':`<b style="color:var(--coin);font-weight:500">★ ${r.rating}</b>`}</div>
   <p>${r.comment?esc(r.comment):'<i style="color:var(--muted)">Note sans commentaire</i>'}</p>
   ${reps.length?`<p class="why">Signalé par ${reps.length} joueur${reps.length>1?'s':''}${reps.some(x=>x.reason)?' : '+esc(reps.filter(x=>x.reason).map(x=>x.reason).join(' · ')):''}</p>`:''}
   ${hid?'<p class="note" style="margin:0">Les joueurs ne le voient plus ; son auteur, si.</p>':''}
@@ -971,7 +1017,7 @@ function drawJoueurs(){
  if(A.plErr)return `<p class="adm-empty">Impossible de charger les joueurs. <button class="btn sm ghost" type="button" data-adm-act="reload">RÉESSAYER</button></p>`;
  if(!A.players)return `<p class="adm-empty">Chargement…</p>`;
  if(!A.players.length)return `<p class="adm-empty">Aucun compte pour l'instant.</p>`;
- return `<p class="lead" style="margin-bottom:14px">${A.players.length} compte${A.players.length>1?'s':''}. Les adresses e-mail ne sont pas affichées ici.</p><ul class="plist">${A.players.map(p=>`<li><span class="av" style="background:${avCol(p.id)}" aria-hidden="true"></span><span class="nm">${esc(p.name)}${p.role==='admin'?'<span class="atag">ADMIN</span>':''}<small>Inscrit le ${day(p.created_at)} · vu ${ago(p.last_seen)}</small></span><span class="rt">${nf(p.launches)} partie${p.launches>1?'s':''}<br>${nf(p.reviews)} avis</span></li>`).join('')}</ul>`;
+ return `<p class="lead" style="margin-bottom:14px">${A.players.length} compte${A.players.length>1?'s':''}. Les adresses e-mail ne sont pas affichées ici.</p><ul class="plist">${A.players.map(p=>`<li>${avBox(p.id,A.avas[p.id])}<span class="nm">${esc(p.name)}${p.role==='admin'?'<span class="atag">ADMIN</span>':''}<small>Inscrit le ${day(p.created_at)} · vu ${ago(p.last_seen)}</small></span><span class="rt">${nf(p.launches)} partie${p.launches>1?'s':''}<br>${nf(p.reviews)} avis</span></li>`).join('')}</ul>`;
 }
 
 function admSub(){const h=(location.hash||'').slice(1);return h==='admin-avis'?'avis':h==='admin-joueurs'?'joueurs':'bord'}
@@ -1016,6 +1062,128 @@ document.addEventListener('click',e=>{
 });
 document.addEventListener('change',e=>{if(e.target.id==='adm-me'){A.me=e.target.checked;loadAdminStats()}});
 
+// ---- V2 : compte joueur (profil, avatar, mes jeux, données, suppression)
+const AVA={'slime-lime':['slime','#C6F24E'],'slime-violet':['slime','#7E2CA3'],'fantome-blanc':['fantome','#F5EFFA'],'fantome-cyan':['fantome','#5EC8E0'],'crane-jaune':['crane','#FFD447'],'crane-rose':['crane','#FF8FA3'],'chat-orange':['chat','#FF9F43'],'chat-violet':['chat','#C28CE0']};
+const AVA_SHAPE={
+ slime:['M2 1h4v1h-4zM1 2h6v1h-6zM0 3h8v4h-8zM1 7h6v1h-6z','M2 4h1v1h-1zM5 4h1v1h-1zM3 6h2v1h-2z'],
+ fantome:['M2 0h4v1h-4zM1 1h6v1h-6zM0 2h8v5h-8zM0 7h2v1h-2zM3 7h2v1h-2zM6 7h2v1h-2z','M2 3h1v2h-1zM5 3h1v2h-1zM3 5h2v1h-2z'],
+ crane:['M1 0h6v1h-6zM0 1h8v4h-8zM1 5h6v1h-6zM2 6h4v2h-4z','M1 2h2v2h-2zM5 2h2v2h-2zM3 4h2v1h-2zM3 7h1v1h-1z'],
+ chat:['M0 0h1v1h-1zM7 0h1v1h-1zM0 1h2v1h-2zM6 1h2v1h-2zM0 2h8v5h-8zM1 7h6v1h-6z','M2 3h1v2h-1zM5 3h1v2h-1zM3 5h2v1h-2z']
+};
+const AVA_NAME={slime:'slime',fantome:'fantôme',crane:'crâne',chat:'chat'};
+function avaSvg(id,size){
+ const a=AVA[id]||AVA['slime-lime'],sh=AVA_SHAPE[a[0]],eye=a[1]==='#7E2CA3'?'#F5EFFA':'#140A1C';
+ return `<svg class="ava" width="${size}" height="${size}" viewBox="0 0 8 8" shape-rendering="crispEdges" aria-hidden="true"><path fill="${a[1]}" d="${sh[0]}"/><path fill="${eye}" d="${sh[1]}"/></svg>`;
+}
+const M={games:null,reviews:[],err:false,edit:false,ava:null,busy:false,msg:null,del:false,delBusy:false,delErr:null,expBusy:false};
+
+async function loadMine(){
+ if(!S.sb||!uid())return;
+ const [g,r]=await Promise.all([
+  S.sb.rpc('my_games'),
+  S.sb.from('reviews').select('id,game_id,rating,comment,status,created_at,updated_at').eq('user_id',uid())
+ ]);
+ M.err=!!(g.error||r.error);
+ M.games={};(g.data||[]).forEach(x=>M.games[x.game_id]=x);
+ M.reviews=r.data||[];
+ if((location.hash||'#')==='#compte')drawAccount();
+}
+
+function drawProfile(){
+ const p=S.profile||{display_name:'Joueur',avatar:'slime-lime'};
+ const since=p.created_at?new Date(p.created_at).toLocaleDateString('fr-FR',{month:'long',year:'numeric'}):'';
+ const top=`<div class="pf-top"><div class="pf-av">${avaSvg(M.edit?(M.ava||p.avatar):p.avatar,52)}</div><div class="pf-id"><h2>${esc(p.display_name)}</h2>${since?`<p>Membre depuis ${since}</p>`:''}${p.role==='admin'?'<span class="atag">ADMIN</span>':''}</div></div>`;
+ if(!M.edit)return `<section class="pf" aria-label="Profil">${top}${p.display_name==='Joueur'?'<p class="rv-msg">Choisis un pseudo : c\'est le nom affiché sur tes avis.</p>':''}<button class="btn ghost wide" type="button" data-acc="edit">MODIFIER PSEUDO ET AVATAR</button>${M.msg&&!M.msg.err?`<p class="rv-msg" role="status">${esc(M.msg.t)}</p>`:''}</section>`;
+ const cur=M.ava||p.avatar;
+ return `<section class="pf" aria-label="Modifier le profil">${top}<form id="prof-f" novalidate>
+ <div><label class="lb" for="prof-name">Pseudo, affiché sur tes avis</label><input type="text" id="prof-name" maxlength="40" value="${esc(p.display_name)}" autocomplete="nickname"></div>
+ <fieldset><legend>Avatar</legend><div class="ava-grid">${Object.keys(AVA).map(id=>`<button type="button" data-ava="${id}" aria-pressed="${id===cur}" aria-label="Avatar ${AVA_NAME[AVA[id][0]]}">${avaSvg(id,36)}</button>`).join('')}</div></fieldset>
+ <div class="row2"><button class="btn ghost" type="button" data-acc="cancel">ANNULER</button><button class="btn" type="submit"${M.busy?' disabled':''}>${M.busy?'…':'ENREGISTRER'}</button></div>
+ ${M.msg&&M.msg.err?`<p class="rv-msg err" role="alert">${esc(M.msg.t)}</p>`:''}</form></section>`;
+}
+
+function drawMyGames(){
+ if(M.games===null)return '<p class="rv-msg">Chargement…</p>';
+ return `<div class="mg">${Object.keys(GAMES).map(k=>{const g=GAMES[k],s=M.games[g.db],rv=M.reviews.find(r=>r.game_id===g.db);
+  const sub=s&&s.launches?`${nf(s.launches)} partie${s.launches>1?'s':''} · dernière ${ago(s.last_at)}${s.play_s?' · '+dur(s.play_s)+' de jeu':''}`:'Pas encore joué avec ton compte';
+  const note=rv?`<span class="mine">Ta note ${starRow(rv.rating)}</span>`:`<a href="#jeu-${k}">Donner ma note</a>`;
+  return `<article><div class="hd"><img src="${IMG[g.icon]}" alt=""><div><h3>${esc(g.name)}</h3><p>${sub}</p></div></div><div class="ft">${note}<a class="btn sm" href="#lancement-${k}">${pi('play')}JOUER</a></div></article>`}).join('')}</div>
+ <p class="note">Tes parties sont comptées quand tu joues connecté. Ta progression dans les jeux reste pour l'instant sur cet appareil.</p>`;
+}
+
+function drawLoggedIn(el){
+ const tot=Object.values(M.games||{}).reduce((a,x)=>({l:a.l+Number(x.launches||0),t:a.t+Number(x.play_s||0)}),{l:0,t:0});
+ const adm=S.profile?.role==='admin'?`<a class="adm-alert" href="#admin" style="margin:0 0 12px;background:var(--raised);border-color:var(--line)"><svg class="pi" viewBox="0 0 8 8" aria-hidden="true" style="color:var(--vtext)"><use href="#i-chart"/></svg><span><b>Espace admin</b>Tableau de bord, modération, joueurs</span><span aria-hidden="true" style="flex:0;font-size:20px">›</span></a>`:'';
+ const del=M.del?`<div class="del-box" role="alertdialog" aria-labelledby="del-t"><p id="del-t"><b>Supprimer ton compte ?</b><br>Ton pseudo, ton adresse e-mail et tes avis sont effacés pour de bon. Tes parties restent dans les statistiques, mais sans lien avec toi. Ta progression sur cet appareil n'est pas touchée.</p><div class="row2"><button class="btn ghost" type="button" data-acc="del-no">ANNULER</button><button class="btn red" type="button" data-acc="del-yes"${M.delBusy?' disabled':''}>${M.delBusy?'…':'TOUT SUPPRIMER'}</button></div>${M.delErr?`<p class="rv-msg err" role="alert">${esc(M.delErr)}</p>`:''}</div>`
+  :`<button class="btn danger wide" type="button" data-acc="del">SUPPRIMER MON COMPTE</button>`;
+ el.innerHTML=`${drawProfile()}
+ <div class="tiles" aria-label="Mes chiffres"><div><b>${M.games?nf(tot.l):'–'}</b><span>parties</span></div><div><b>${M.games?dur(tot.t):'–'}</b><span>de jeu</span></div><div><b>${M.games?nf(M.reviews.length):'–'}</b><span>avis donnés</span></div></div>
+ ${adm}
+ <h2 class="acc-h">MES JEUX</h2>${drawMyGames()}
+ <h2 class="acc-h">MES DONNÉES</h2>
+ <div class="acc-list"><div class="k"><small>Adresse e-mail</small><span>${esc(S.session.user.email)}</span></div>
+ <a href="#confidentialite">Ce qu'on garde sur toi<span class="chev" aria-hidden="true">›</span></a>
+ <button type="button" data-acc="export"${M.expBusy?' disabled':''}>${M.expBusy?'Préparation…':'Télécharger mes données'}<span class="chev" aria-hidden="true">›</span></button>
+ <button type="button" id="logout">Se déconnecter</button></div>
+ ${del}`;
+}
+
+async function saveProfile(){
+ const name=($('#prof-name')?.value||'').trim().slice(0,40);
+ if(!name){M.msg={t:'Le pseudo ne peut pas être vide.',err:true};drawAccount();return}
+ const ava=M.ava||S.profile?.avatar||'slime-lime';
+ M.busy=true;M.msg=null;drawAccount();
+ const {error}=await S.sb.from('profiles').update({display_name:name,avatar:ava}).eq('id',uid());
+ M.busy=false;
+ if(error){M.msg={t:"L'enregistrement n'a pas marché, réessaie.",err:true};drawAccount();return}
+ S.profile={...S.profile,display_name:name,avatar:ava};M.edit=false;M.ava=null;M.msg={t:'Profil enregistré.'};
+ const nc=$('#nav-compte');if(nc)nc.textContent=name.slice(0,16);
+ drawAccount();Object.keys(GAMES).forEach(k=>{if(S.loaded[k])loadReviews(k)});
+}
+
+async function exportData(){
+ M.expBusy=true;drawAccount();
+ const [ev,rv]=await Promise.all([
+  S.sb.from('events').select('type,game_id,platform,duration_s,created_at').eq('user_id',uid()).order('created_at',{ascending:false}).limit(10000),
+  S.sb.from('reviews').select('game_id,rating,comment,status,created_at,updated_at').eq('user_id',uid())
+ ]);
+ M.expBusy=false;
+ const p=S.profile||{};
+ const data={exporte_le:new Date().toISOString(),source:'iiGameStudio (iigamestudio.vercel.app)',
+  compte:{email:S.session.user.email,pseudo:p.display_name,avatar:p.avatar,role:p.role,inscrit_le:p.created_at},
+  avis:rv.data||[],parties_par_jeu:Object.values(M.games||{}),evenements:ev.data||[],
+  sur_cet_appareil:"La progression dans les jeux est enregistrée dans ton navigateur, pas sur nos serveurs."};
+ const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+ const fname='iigamestudio-mes-donnees.json';
+ try{const f=new File([blob],fname,{type:'application/json'});if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],title:'Mes données iiGameStudio'});drawAccount();return}}catch(e){if(e&&e.name==='AbortError'){drawAccount();return}}
+ const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=fname;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},1000);
+ drawAccount();
+}
+
+async function deleteAccount(){
+ M.delBusy=true;M.delErr=null;drawAccount();
+ const {error}=await S.sb.rpc('delete_my_account');
+ if(error){M.delBusy=false;M.delErr="La suppression n'a pas marché. Réessaie, ou écris à iigamestudio@gmail.com.";drawAccount();return}
+ try{await S.sb.auth.signOut({scope:'local'})}catch(e){}
+ S.session=null;S.profile=null;syncAdmin();
+ Object.assign(M,{games:null,reviews:[],edit:false,ava:null,del:false,delBusy:false,msg:null});
+ S.login={step:'email',email:'',busy:false,msg:{t:'Ton compte a été supprimé. À bientôt peut-être !'}};
+ drawAccount();loadStats();Object.keys(GAMES).forEach(k=>{if(S.loaded[k])loadReviews(k)});
+}
+
+document.addEventListener('click',e=>{
+ const av=e.target.closest('[data-ava]');if(av){M.ava=av.dataset.ava;$$('[data-ava]').forEach(b=>b.setAttribute('aria-pressed',b===av));const big=$('.pf-av');if(big)big.innerHTML=avaSvg(M.ava,52);return}
+ const b=e.target.closest('[data-acc]');if(!b)return;
+ const a=b.dataset.acc;
+ if(a==='edit'){M.edit=true;M.ava=S.profile?.avatar||'slime-lime';M.msg=null;drawAccount();$('#prof-name')?.focus();return}
+ if(a==='cancel'){M.edit=false;M.ava=null;M.msg=null;drawAccount();return}
+ if(a==='export'){exportData();return}
+ if(a==='del'){M.del=true;M.delErr=null;drawAccount();return}
+ if(a==='del-no'){M.del=false;drawAccount();return}
+ if(a==='del-yes'){deleteAccount();return}
+});
+document.addEventListener('submit',e=>{if(e.target.id==='prof-f'){e.preventDefault();saveProfile()}});
+
 // navigation
 let timer=null,prev='';
 function setTab(t){
@@ -1040,7 +1208,7 @@ function show(){
  if(h==='jeux'){view='accueil';scroll='#jeux-section'}
  if(h==='studio'){view='accueil';scroll='#studio-section'}
  if(h.startsWith('jeu-')){tab='jeux';const gk=h.slice(4);if(GAMES[gk])loadReviews(gk)}
- if(h==='compte')drawAccount();
+ if(h==='compte'){drawAccount();loadMine()}
  if(h==='admin'||h.startsWith('admin-')){view='admin';tab='admin';openAdmin()}
  if(h.startsWith('installer-')&&TARGETS[h.slice(10)]){target=h.slice(10);view='installer'}
  else if(h==='installer')target='store';
