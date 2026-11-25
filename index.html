@@ -402,6 +402,83 @@ ol.steps2 li::before{content:counter(s);font-family:var(--px);color:var(--lime);
  .foot-links a:hover{color:var(--ink)}
 }
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+/* ===== Admin (V2) ===== */
+:root{--c2:#C6F24E}
+:root[data-theme=light]{--c2:#5E8C00}
+.tabbar{grid-template-columns:none;grid-auto-flow:column;grid-auto-columns:1fr}
+body:not(.is-admin) .adm-only{display:none!important}
+.adm-tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:4px 0 18px}
+.adm-tabs[hidden]{display:none}
+.adm-tabs a{min-height:44px;display:flex;align-items:center;justify-content:center;gap:6px;font-family:var(--px);font-size:12px;color:var(--ink);text-decoration:none;background:var(--raised);border:1px solid var(--line);border-radius:var(--r)}
+.adm-tabs a[aria-current=page]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.adm-badge{min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:var(--coin);color:#140A1C;font-family:Rubik,sans-serif;font-size:11px;font-weight:700;line-height:18px;text-align:center}
+.tabbar .adm-badge{position:absolute;top:6px;left:calc(50% + 6px);min-width:16px;height:16px;line-height:16px;font-size:10px}
+.adm-me{display:flex;align-items:center;gap:10px;font-size:14px;color:var(--muted);margin:-4px 0 16px;min-height:44px}
+.adm-me input{width:20px;height:20px;accent-color:var(--violet)}
+.adm-alert{display:flex;align-items:center;gap:14px;background:color-mix(in srgb,var(--coin) 14%,var(--bg));border:1px solid color-mix(in srgb,var(--coin) 45%,var(--bg));border-radius:var(--r-lg);padding:14px 16px;color:var(--ink);text-decoration:none;margin-bottom:16px}
+.adm-alert .pi{width:22px;height:22px;color:var(--coin);flex:0 0 22px}
+.adm-alert span{flex:1;display:flex;flex-direction:column;font-size:13px;color:var(--muted)}
+.adm-alert b{font-size:15px;color:var(--ink)}
+.kpis{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px}
+.kpi{background:var(--raised);border:1px solid var(--line);border-radius:var(--r-lg);padding:14px}
+.kpi small{display:block;font-size:12px;color:var(--muted)}
+.kpi strong{display:block;font-family:var(--px);font-weight:400;font-size:26px;line-height:1.25;margin-top:4px}
+.kpi em{display:block;font-style:normal;font-size:12px;color:var(--muted);margin-top:2px}
+.kpi em.up{color:var(--vtext)}
+.adm-box{background:var(--raised);border:1px solid var(--line);border-radius:var(--r-lg);padding:16px;margin-bottom:16px}
+.adm-box h2,.adm-h{font-family:var(--px);font-weight:400;font-size:15px}
+.adm-h{font-size:17px;margin:24px 0 10px;display:flex;justify-content:space-between;align-items:baseline}
+.adm-h a{font-family:Rubik,sans-serif;font-size:13px;color:var(--vtext)}
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin:8px 0 6px}
+.legend span{display:flex;align-items:center;gap:6px}
+.legend i{width:14px;height:3px;display:block}
+.chart{width:100%;height:auto;display:block}
+.chart text{fill:var(--muted);font:10px Rubik,sans-serif}
+.chart .grid{stroke:var(--line)}
+.gstat{display:grid;gap:12px}
+.gstat .hd{display:flex;align-items:center;gap:12px}
+.gstat .hd img{width:44px;height:44px;border-radius:10px;display:block}
+.gstat .hd h3{flex:1;font-size:16px}
+.gstat .hd b{font-size:14px;color:var(--coin);font-weight:500}
+.cells{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;text-align:center}
+.cells div{background:var(--stage);border-radius:var(--r);padding:8px 4px}
+.cells b{display:block;font-family:var(--px);font-weight:400;font-size:15px}
+.cells span{display:block;font-size:11px;color:var(--muted)}
+.plist{list-style:none;margin:0;padding:0;background:var(--raised);border:1px solid var(--line);border-radius:var(--r-lg)}
+.plist li{min-height:56px;padding:10px 14px;display:flex;align-items:center;gap:12px;border-top:1px solid var(--line)}
+.plist li:first-child{border-top:0}
+.plist .av{width:32px;height:32px;border-radius:8px;flex:0 0 32px}
+.plist .nm{flex:1;display:flex;flex-direction:column;font-size:15px}
+.plist .nm small{font-size:12px;color:var(--muted)}
+.plist .rt{font-size:12px;color:var(--muted);text-align:right}
+.plist .nm .atag{align-self:flex-start;margin:4px 0 2px}
+.nav-d .adm-badge{margin-left:6px}
+.atag{font-family:var(--px);font-size:10px;line-height:1;background:var(--violet);color:#fff;padding:4px 6px;border-radius:4px;margin-left:6px;vertical-align:2px}
+.flt{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.flt button{min-height:40px;padding:0 14px;font:inherit;font-size:13px;color:var(--ink);background:var(--raised);border:1px solid var(--line);border-radius:20px;cursor:pointer}
+.flt button[aria-pressed=true]{background:var(--ink);color:var(--bg);border-color:var(--ink);font-weight:700}
+.flt button.sig[aria-pressed=true]{background:var(--coin);border-color:var(--coin);color:#140A1C}
+.mod{display:grid;gap:10px}
+.mod article{background:var(--raised);border:1px solid var(--line);border-radius:var(--r-lg);padding:16px;display:grid;gap:10px}
+.mod article.sig{border-color:color-mix(in srgb,var(--coin) 55%,var(--bg))}
+.mod article.off{background:transparent;border-style:dashed}
+.mod .hd{display:flex;align-items:center;gap:10px}
+.mod .hd .av{width:32px;height:32px;border-radius:8px;flex:0 0 32px}
+.mod .hd span{flex:1;display:flex;flex-direction:column;font-size:15px;font-weight:700}
+.mod .hd small{font-size:12px;color:var(--muted);font-weight:400}
+.mod p{font-size:15px;line-height:1.45;overflow-wrap:anywhere}
+.mod article.off p{color:var(--muted)}
+.mod .why{font-size:12px;color:var(--coin)}
+:root[data-theme=light] .mod .why{color:#8A6A00}
+.mod .acts{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.mod .acts .btn{min-height:44px;font-size:13px}
+.mod .acts .btn:only-child{grid-column:1/-1}
+.adm-empty{text-align:center;color:var(--muted);font-size:14px;padding:28px 12px;background:var(--raised);border:1px dashed var(--line);border-radius:var(--r-lg)}
+@media (min-width:960px){
+ .adm .kpis{grid-template-columns:repeat(4,1fr)}
+ .adm .games2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+ .adm .games2 .adm-box{margin-bottom:0}
+}
 </style>
 </head>
 <body>
@@ -416,6 +493,7 @@ ol.steps2 li::before{content:counter(s);font-family:var(--px);color:var(--lime);
 <symbol id="i-back" viewBox="0 0 8 8"><path fill="currentColor" d="M3 0h1v1h-1zM2 1h2v1h-2zM1 2h7v1h-7zM0 3h8v1h-8zM1 4h7v1h-7zM2 5h2v1h-2zM3 6h1v1h-1z"/></symbol>
 <symbol id="i-play" viewBox="0 0 8 8"><path fill="currentColor" d="M0 0h2v1h-2zM0 1h4v1h-4zM0 2h6v1h-6zM0 3h8v1h-8zM0 4h8v1h-8zM0 5h6v1h-6zM0 6h4v1h-4zM0 7h2v1h-2z"/></symbol>
 <symbol id="i-star" viewBox="0 0 8 8"><path fill="currentColor" d="M3 0h2v1h-2zM3 1h2v1h-2zM2 2h4v1h-4zM0 3h8v1h-8zM1 4h6v1h-6zM2 5h4v1h-4zM1 6h6v1h-6zM0 7h2v1h-2zM6 7h2v1h-2z"/></symbol>
+<symbol id="i-chart" viewBox="0 0 8 8"><path fill="currentColor" d="M0 5h2v3h-2zM3 2h2v6h-2zM6 0h2v8h-2z"/></symbol>
 <symbol id="i-user" viewBox="0 0 8 8"><path fill="currentColor" d="M2 0h4v1h-4zM2 1h4v1h-4zM2 2h4v1h-4zM3 3h2v1h-2zM1 4h6v1h-6zM0 5h8v1h-8zM0 6h8v1h-8zM0 7h8v1h-8z"/></symbol>
 </defs></svg>
 
@@ -425,6 +503,7 @@ ol.steps2 li::before{content:counter(s);font-family:var(--px);color:var(--lime);
 <a href="#jeux" data-nav="jeux">JEUX</a>
 <a href="#studio" data-nav="studio">LE STUDIO</a>
 <a href="#compte" data-nav="compte" id="nav-compte">COMPTE</a>
+<a href="#admin" data-nav="admin" class="adm-only">ADMIN<span class="adm-badge" data-adm-badge hidden></span></a>
 </nav>
 <a href="#installer" class="btn sm hide-sa"><svg class="pi" viewBox="0 0 8 8" aria-hidden="true"><use href="#i-dl"/></svg>INSTALLER</a>
 </div></header>
@@ -437,7 +516,7 @@ ol.steps2 li::before{content:counter(s);font-family:var(--px);color:var(--lime);
 <div>
 <p class="eyebrow">Jeux web gratuits · téléphone et ordi</p>
 <h1 class="px">Les jeux du studio qui n'existe pas.</h1>
-<p class="lead0">Des jeux courts et un peu absurdes, jouables direct dans ton navigateur. Pas de compte, pas de pub.</p>
+<p class="lead0">Des jeux courts et un peu absurdes, jouables direct dans ton navigateur. Pas de pub, et pas besoin de compte pour jouer.</p>
 </div>
 <div class="cta"><a class="btn" href="#jeux">VOIR LES JEUX</a><a class="btn ghost hide-sa" href="#installer"><svg class="pi" viewBox="0 0 8 8" aria-hidden="true"><use href="#i-dl"/></svg>INSTALLER L'APPLI</a></div>
 </section>
@@ -493,6 +572,13 @@ ol.steps2 li::before{content:counter(s);font-family:var(--px);color:var(--lime);
 <div id="acct"></div>
 </div></div>
 
+<!-- ADMIN -->
+<div class="view" id="v-admin"><div class="wrap page adm">
+<h1 class="px">Admin</h1>
+<nav class="adm-tabs" aria-label="Sections admin"><a href="#admin" data-adm="bord">BORD</a><a href="#admin-avis" data-adm="avis">AVIS<span class="adm-badge" data-adm-badge hidden></span></a><a href="#admin-joueurs" data-adm="joueurs">JOUEURS</a></nav>
+<div id="adm"></div>
+</div></div>
+
 <!-- CONFIDENTIALITE -->
 <div class="view" id="v-confidentialite"><div class="wrap page legal">
 <a class="back" href="#accueil"><svg class="pi" viewBox="0 0 8 8" aria-hidden="true"><use href="#i-back"/></svg>ACCUEIL</a>
@@ -526,6 +612,7 @@ ol.steps2 li::before{content:counter(s);font-family:var(--px);color:var(--lime);
 <a href="#accueil" data-tab="accueil"><svg class="pi" viewBox="0 0 8 8" aria-hidden="true"><use href="#i-home"/></svg>Accueil</a>
 <a href="#jeux" data-tab="jeux"><svg class="pi" viewBox="0 0 8 8" aria-hidden="true"><use href="#i-grid"/></svg>Jeux</a>
 <a href="#compte" data-tab="compte"><svg class="pi" viewBox="0 0 8 8" aria-hidden="true"><use href="#i-user"/></svg>Compte</a>
+<a href="#admin" data-tab="admin" class="adm-only"><svg class="pi" viewBox="0 0 8 8" aria-hidden="true"><use href="#i-chart"/></svg>Admin<span class="adm-badge" data-adm-badge hidden></span></a>
 <a href="#installer" data-tab="installer"><svg class="pi" viewBox="0 0 8 8" aria-hidden="true"><use href="#i-dl"/></svg>Installer</a>
 </nav>
 
@@ -586,7 +673,7 @@ for(const k in GAMES){const g=GAMES[k];
   <div class="gp-info">
    <p class="lead1">${g.lead}</p>
    <a class="btn play-d" href="#lancement-${k}">${pi('play')}JOUER</a>
-   <p class="fine">Gratuit · sans pub · sans compte · téléphone et ordi</p>
+   <p class="fine">Gratuit · sans pub · sans compte obligatoire · téléphone et ordi</p>
    <div class="chips"><a class="chip" href="#installer-${k}">${pi('dl')}INSTALLER CE JEU</a></div>
   </div>
  </div>
@@ -649,9 +736,10 @@ const uid=()=>S.session?.user?.id||null;
 try{if(window.supabase)S.sb=window.supabase.createClient(SB_URL,SB_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,flowType:'pkce'}})}catch(e){S.sb=null}
 
 async function loadProfile(){
- if(!S.sb||!uid()){S.profile=null;return}
+ if(!S.sb||!uid()){S.profile=null;syncAdmin();return}
  const {data}=await S.sb.from('profiles').select('display_name,role').eq('id',uid()).maybeSingle();
  S.profile=data||{display_name:'Joueur',role:'player'};
+ syncAdmin();
 }
 async function loadStats(){
  if(!S.sb)return;
@@ -705,7 +793,7 @@ function drawAccount(){
   const p=S.profile||{display_name:'Joueur'};
   el.innerHTML=`<div class="acct-card"><h2>Ton pseudo</h2><p class="rv-msg">C'est le nom affiché sur tes avis.${p.display_name==='Joueur'?' Choisis-en un !':''}</p>
   <form id="name-f" novalidate style="display:grid;gap:10px"><label class="sr" for="name-in">Pseudo</label><input id="name-in" class="field-in" maxlength="40" value="${esc(p.display_name)}" autocomplete="nickname" style="font:inherit;font-size:16px;color:var(--ink);background:var(--bg);border:2px solid var(--line);border-radius:var(--r);padding:12px"><button class="btn" type="submit">ENREGISTRER</button><p class="rv-msg" id="name-msg" role="status"></p></form></div>
-  <div class="acct-card"><h2>Connexion</h2><p class="rv-msg">Connecté avec ${esc(S.session.user.email)}.</p><button class="btn ghost" type="button" id="logout">SE DÉCONNECTER</button></div>
+  ${S.profile?.role==='admin'?`<a class="adm-alert" href="#admin" style="margin-bottom:16px;background:var(--raised);border-color:var(--line)"><svg class="pi" viewBox="0 0 8 8" aria-hidden="true" style="color:var(--vtext)"><use href="#i-chart"/></svg><span><b>Espace admin</b>Tableau de bord, modération, joueurs</span><span aria-hidden="true" style="flex:0;font-size:20px">›</span></a>`:''}<div class="acct-card"><h2>Connexion</h2><p class="rv-msg">Connecté avec ${esc(S.session.user.email)}.</p><button class="btn ghost" type="button" id="logout">SE DÉCONNECTER</button></div>
   <p class="note">Pour supprimer ton compte et tes avis, écris à <a href="mailto:iigamestudio@gmail.com">iigamestudio@gmail.com</a>.</p>`;
   return;
  }
@@ -762,13 +850,171 @@ document.addEventListener('click',async e=>{
 if(S.sb){
  S.sb.auth.onAuthStateChange((ev,session)=>{
   S.session=session;
-  setTimeout(async()=>{await loadProfile();drawAccount();drawAllReviews();Object.keys(GAMES).forEach(k=>{if(S.loaded[k])loadReviews(k)});
+  setTimeout(async()=>{await loadProfile();S.authReady=true;drawAccount();if((location.hash||'').startsWith('#admin'))openAdmin();drawAllReviews();Object.keys(GAMES).forEach(k=>{if(S.loaded[k])loadReviews(k)});
    if(ev==='SIGNED_IN'){S.login={step:'email',email:'',busy:false,msg:null};let fromLink=false;try{fromLink=sessionStorage.getItem('iig-login')==='1';sessionStorage.removeItem('iig-login')}catch(_){}if(fromLink&&location.hash!=='#compte')location.hash='#compte'}
    const nc=$('#nav-compte');if(nc)nc.textContent=uid()?(S.profile?.display_name||'Compte').slice(0,16):'COMPTE';
   },0);
  });
  loadStats();
 }
+
+// ---- V2 : espace admin (tableau de bord, modération, joueurs)
+const A={period:'7d',me:false,stats:null,err:null,loading:false,rv:null,reps:{},rvErr:null,flt:'sig',fg:'all',players:null,plErr:null,busy:{},pending:0};
+const isAdmin=()=>S.profile?.role==='admin';
+const GBY={};Object.keys(GAMES).forEach(k=>GBY[GAMES[k].db]={k,name:GAMES[k].name,icon:IMG[GAMES[k].icon]||''});
+const nf=n=>Number(n||0).toLocaleString('fr-FR');
+const dur=s=>{s=Math.round(s||0);if(s<60)return s+' s';if(s<3600)return Math.round(s/60)+' min';const h=Math.floor(s/3600),m=Math.round((s%3600)/60);return h+' h'+(m?' '+String(m).padStart(2,'0'):'')};
+const ago=t=>{if(!t)return'jamais';const d=(Date.now()-new Date(t))/1000;if(d<60)return"à l'instant";if(d<3600)return'il y a '+Math.round(d/60)+' min';if(d<86400)return'il y a '+Math.round(d/3600)+' h';const j=Math.round(d/86400);if(j===1)return'hier';if(j<30)return'il y a '+j+' jours';return'le '+new Date(t).toLocaleDateString('fr-FR',{day:'numeric',month:'short',year:'numeric'})};
+const day=t=>new Date(t).toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'});
+const avCol=id=>['#C6F24E','#FFD447','#C28CE0','#7E2CA3','#5EC8E0','#FF8FA3'][[...String(id)].reduce((a,c)=>a+c.charCodeAt(0),0)%6];
+function delta(c,p){if(!p)return c?{t:'nouveau',up:true}:{t:'',up:false};const v=Math.round((c-p)/p*100);return{t:(v>0?'+':'')+v+' % vs avant',up:v>0}}
+
+function setAdminBadge(){
+ const n=A.pending;$$('[data-adm-badge]').forEach(b=>{b.hidden=!n;b.textContent=n});
+}
+function syncAdmin(){
+ document.body.classList.toggle('is-admin',isAdmin());
+ if(isAdmin())refreshPending();else{A.pending=0;setAdminBadge()}
+}
+async function refreshPending(){
+ const {data,error}=await S.sb.from('review_reports').select('review_id');
+ if(!error){A.pending=new Set((data||[]).map(r=>r.review_id)).size;setAdminBadge()}
+}
+
+async function loadAdminStats(){
+ A.loading=true;A.err=null;drawAdmin();
+ const {data,error}=await S.sb.rpc('admin_stats',{p_period:A.period,p_me:A.me});
+ A.loading=false;if(error){A.err=error.message}else{A.stats=data;A.pending=data.reported;setAdminBadge()}
+ drawAdmin();
+}
+async function loadAdminReviews(){
+ const [r,p]=await Promise.all([
+  S.sb.from('reviews').select('id,game_id,user_id,rating,comment,status,created_at,updated_at,profiles(display_name)').order('created_at',{ascending:false}).limit(300),
+  S.sb.from('review_reports').select('review_id,reason,created_at')
+ ]);
+ if(r.error||p.error){A.rvErr=(r.error||p.error).message;drawAdmin();return}
+ A.rvErr=null;A.rv=r.data||[];A.reps={};(p.data||[]).forEach(x=>{(A.reps[x.review_id]=A.reps[x.review_id]||[]).push(x)});
+ A.pending=Object.keys(A.reps).length;setAdminBadge();drawAdmin();
+}
+async function loadAdminPlayers(){
+ const {data,error}=await S.sb.rpc('admin_players');
+ A.plErr=error?error.message:null;A.players=data||[];drawAdmin();
+}
+
+function chartSvg(series,hourly){
+ const box=$('#adm'),W=Math.round(Math.max(300,Math.min(760,(box?box.clientWidth:340)-34))),H=W>500?190:150,L=8,R=26,T=10,B=H-24,n=series.length;
+ const max=Math.max(1,...series.map(s=>Math.max(s.ntd,s.slime)));
+ const top=max<=4?4:Math.ceil(max/4)*4;
+ const x=i=>n<2?(L+W-R)/2:L+i*((W-R-L)/(n-1)),y=v=>B-(v/top)*(B-T);
+ const line=(k,c)=>`<polyline fill="none" stroke="${c}" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" points="${series.map((s,i)=>x(i).toFixed(1)+','+y(s[k]).toFixed(1)).join(' ')}"/>`+(n?`<circle cx="${x(n-1).toFixed(1)}" cy="${y(series[n-1][k]).toFixed(1)}" r="3.5" fill="${c}"/>`:'');
+ const grid=[0,top/2,top].map(v=>`<line class="grid" x1="${L}" x2="${W-R}" y1="${y(v)}" y2="${y(v)}"${v?' stroke-dasharray="2 3"':''}/><text x="${W}" y="${y(v)+3}" text-anchor="end">${v}</text>`).join('');
+ const lab=i=>{const t=series[i].t;return hourly?t+' h':new Date(t+'T12:00:00').toLocaleDateString('fr-FR',{day:'numeric',month:'short'})};
+ const idx=n<=1?[0]:[0,Math.floor((n-1)/2),n-1];
+ const xl=[...new Set(idx)].map(i=>`<text x="${x(i).toFixed(1)}" y="${H-6}" text-anchor="${i===0?'start':i===n-1?'end':'middle'}">${lab(i)}</text>`).join('');
+ const tot=k=>series.reduce((a,s)=>a+s[k],0);
+ return `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Parties par ${hourly?'heure':'jour'} : ${tot('ntd')} pour Nine Tiles Dungeon, ${tot('slime')} pour Slime Vertical">${grid}${line('slime','var(--c2)')}${line('ntd','var(--vtext)')}${xl}</svg>`;
+}
+
+function drawBord(){
+ const s=A.stats;
+ const seg=`<div class="seg" role="tablist" aria-label="Période">${[['today',"Aujourd'hui"],['7d','7 jours'],['30d','30 jours']].map(([v,t])=>`<button type="button" role="tab" data-period="${v}" aria-selected="${A.period===v}">${t}</button>`).join('')}</div>
+ <label class="adm-me"><input type="checkbox" id="adm-me"${A.me?' checked':''}> Compter aussi mes visites</label>`;
+ if(A.err)return seg+`<p class="adm-empty">Impossible de charger les chiffres. <button class="btn sm ghost" type="button" data-adm-act="reload">RÉESSAYER</button></p>`;
+ if(!s)return seg+`<p class="adm-empty">Chargement…</p>`;
+ const v=delta(s.visits,s.visits_prev),l=delta(s.launches,s.launches_prev);
+ const kp=(t,n,e,up)=>`<div class="kpi"><small>${t}</small><strong>${n}</strong><em${up?' class="up"':''}>${e||'&nbsp;'}</em></div>`;
+ const alert=s.reported?`<a class="adm-alert" href="#admin-avis"><svg class="pi" viewBox="0 0 8 8" aria-hidden="true"><use href="#i-bell"/></svg><span><b>${s.reported} avis signalé${s.reported>1?'s':''}</b>À regarder dans la modération</span><span aria-hidden="true" style="flex:0;font-size:20px;color:var(--coin)">›</span></a>`:'';
+ const games=(s.games||[]).map(g=>{const m=GBY[g.id]||{name:g.id,icon:''};return `<article class="adm-box gstat"><div class="hd">${m.icon?`<img src="${m.icon}" alt="">`:''}<h3>${esc(m.name)}</h3>${g.rating?`<b>★ ${fmt(g.rating)}</b>`:''}</div><div class="cells"><div><b>${nf(g.launches)}</b><span>parties</span></div><div><b>${nf(g.players)}</b><span>sessions</span></div><div><b>${dur(g.play_s)}</b><span>de jeu</span></div><div><b>${nf(g.reviews)}</b><span>avis</span></div></div></article>`}).join('');
+ const recent=(s.recent||[]).map(p=>`<li><span class="av" style="background:${avCol(p.id)}" aria-hidden="true"></span><span class="nm">${esc(p.name)}${p.role==='admin'?'<span class="atag">ADMIN</span>':''}</span><span class="rt">${ago(p.created_at)}</span></li>`).join('');
+ return seg+alert+`<div class="kpis" aria-busy="${A.loading}">
+ ${kp('Visites',nf(s.visits),v.t,v.up)}
+ ${kp('Parties lancées',nf(s.launches),l.t,l.up)}
+ ${kp('Temps de jeu',dur(s.play_s),'tous jeux')}
+ ${kp('Joueurs connectés',nf(s.players),'avec un compte')}
+ ${kp('Nouveaux comptes',nf(s.new_accounts),nf(s.accounts)+' au total')}
+ ${kp('Installations',nf(s.installs),'store et jeux')}
+ ${kp('Nouveaux avis',nf(s.new_reviews),s.new_rating?'note moyenne '+fmt(s.new_rating):'')}
+ ${kp('Avis signalés',nf(s.reported),s.reported?'à traiter':'rien à traiter')}
+ </div>
+ <section class="adm-box"><h2>PARTIES PAR ${A.period==='today'?'HEURE':'JOUR'}</h2>
+ <div class="legend"><span><i style="background:var(--vtext)"></i>Nine Tiles Dungeon</span><span><i style="background:var(--c2)"></i>Slime Vertical</span></div>
+ ${chartSvg(s.series||[],A.period==='today')}</section>
+ <h2 class="adm-h">PAR JEU</h2><div class="games2">${games}</div>
+ <h2 class="adm-h">DERNIERS COMPTES <a href="#admin-joueurs">Tout voir</a></h2>
+ ${recent?`<ul class="plist">${recent}</ul>`:'<p class="adm-empty">Aucun compte pour l\'instant.</p>'}
+ <p class="note">Les visites où tu es connecté en admin ne sont pas comptées${A.me?' (sauf maintenant : case cochée)':''}. Les sessions durent le temps d'un onglet.</p>`;
+}
+
+function drawAvis(){
+ if(A.rvErr)return `<p class="adm-empty">Impossible de charger les avis. <button class="btn sm ghost" type="button" data-adm-act="reload">RÉESSAYER</button></p>`;
+ if(!A.rv)return `<p class="adm-empty">Chargement…</p>`;
+ const inGame=A.rv.filter(r=>A.fg==='all'||r.game_id===A.fg);
+ const sig=inGame.filter(r=>A.reps[r.id]),off=inGame.filter(r=>r.status==='masque');
+ const list=A.flt==='sig'?sig:A.flt==='off'?off:inGame;
+ const fb=(v,t,n,c)=>`<button type="button" data-flt="${v}" class="${c||''}" aria-pressed="${A.flt===v}">${t} · ${n}</button>`;
+ const gb=(v,t)=>`<button type="button" data-fg="${v}" aria-pressed="${A.fg===v}">${t}</button>`;
+ const card=r=>{const reps=A.reps[r.id]||[],hid=r.status==='masque',g=GBY[r.game_id],b=A.busy[r.id];
+  const acts=hid?`<button class="btn ghost" type="button" data-adm-act="show" data-id="${r.id}"${b?' disabled':''}>RÉAFFICHER</button>`
+   :`<button class="btn" type="button" data-adm-act="hide" data-id="${r.id}"${b?' disabled':''}>MASQUER</button>${reps.length?`<button class="btn ghost" type="button" data-adm-act="keep" data-id="${r.id}"${b?' disabled':''}>GARDER</button>`:''}`;
+  return `<article class="${reps.length?'sig':''}${hid?' off':''}"><div class="hd"><span class="av" style="background:${hid?'var(--line)':avCol(r.user_id)}" aria-hidden="true"></span><span>${esc(r.profiles?.display_name||'Joueur')}<small>${esc(g?g.name:r.game_id)} · ${ago(r.created_at)}</small></span>${hid?'<span class="atag" style="background:var(--line);color:var(--ink)">MASQUÉ</span>':`<b style="color:var(--coin);font-weight:500">★ ${r.rating}</b>`}</div>
+  <p>${r.comment?esc(r.comment):'<i style="color:var(--muted)">Note sans commentaire</i>'}</p>
+  ${reps.length?`<p class="why">Signalé par ${reps.length} joueur${reps.length>1?'s':''}${reps.some(x=>x.reason)?' : '+esc(reps.filter(x=>x.reason).map(x=>x.reason).join(' · ')):''}</p>`:''}
+  ${hid?'<p class="note" style="margin:0">Les joueurs ne le voient plus ; son auteur, si.</p>':''}
+  <div class="acts">${acts}</div></article>`};
+ return `<div class="flt" role="group" aria-label="Filtrer les avis">${fb('sig','Signalés',sig.length,'sig')}${fb('all','Tous',inGame.length)}${fb('off','Masqués',off.length)}</div>
+ <div class="flt" role="group" aria-label="Filtrer par jeu">${gb('all','Tous les jeux')}${Object.keys(GBY).map(id=>gb(id,GBY[id].name)).join('')}</div>
+ ${list.length?`<div class="mod">${list.map(card).join('')}</div>`:`<p class="adm-empty">${A.flt==='sig'?'Aucun avis signalé. Tout va bien.':A.flt==='off'?'Aucun avis masqué.':'Aucun avis pour l\'instant.'}</p>`}
+ <p class="note">Chaque décision est notée dans l'historique admin.</p>`;
+}
+
+function drawJoueurs(){
+ if(A.plErr)return `<p class="adm-empty">Impossible de charger les joueurs. <button class="btn sm ghost" type="button" data-adm-act="reload">RÉESSAYER</button></p>`;
+ if(!A.players)return `<p class="adm-empty">Chargement…</p>`;
+ if(!A.players.length)return `<p class="adm-empty">Aucun compte pour l'instant.</p>`;
+ return `<p class="lead" style="margin-bottom:14px">${A.players.length} compte${A.players.length>1?'s':''}. Les adresses e-mail ne sont pas affichées ici.</p><ul class="plist">${A.players.map(p=>`<li><span class="av" style="background:${avCol(p.id)}" aria-hidden="true"></span><span class="nm">${esc(p.name)}${p.role==='admin'?'<span class="atag">ADMIN</span>':''}<small>Inscrit le ${day(p.created_at)} · vu ${ago(p.last_seen)}</small></span><span class="rt">${nf(p.launches)} partie${p.launches>1?'s':''}<br>${nf(p.reviews)} avis</span></li>`).join('')}</ul>`;
+}
+
+function admSub(){const h=(location.hash||'').slice(1);return h==='admin-avis'?'avis':h==='admin-joueurs'?'joueurs':'bord'}
+function drawAdmin(){
+ const el=$('#adm');if(!el)return;
+ const sub=admSub();
+ $$('.adm-tabs a').forEach(a=>{if(a.dataset.adm===sub)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current')});
+ $('.adm-tabs').hidden=!isAdmin();
+ if(!S.sb){el.innerHTML='<p class="adm-empty">Le service de comptes ne répond pas. Réessaie plus tard.</p>';return}
+ if(!S.authReady){el.innerHTML='<p class="adm-empty">Chargement…</p>';return}
+ if(!uid()){el.innerHTML='<p class="adm-empty">Réservé à l\'admin. <a href="#compte">Connecte-toi</a> avec le compte admin.</p>';return}
+ if(!S.profile||!S.authReady){el.innerHTML='<p class="adm-empty">Chargement…</p>';return}
+ if(!isAdmin()){el.innerHTML='<p class="adm-empty">Cet espace est réservé à l\'admin.</p>';return}
+ el.innerHTML=sub==='avis'?drawAvis():sub==='joueurs'?drawJoueurs():drawBord();
+}
+function openAdmin(){
+ drawAdmin();if(!isAdmin())return;
+ const sub=admSub();
+ if(sub==='bord')loadAdminStats();else if(sub==='avis')loadAdminReviews();else loadAdminPlayers();
+}
+
+async function modAct(act,id){
+ const reps=(A.reps[id]||[]).length;A.busy[id]=true;drawAdmin();
+ let err=null;
+ if(act==='hide'||act==='show'){({error:err}=await S.sb.from('reviews').update({status:act==='hide'?'masque':'visible'}).eq('id',id))}
+ if(!err&&(act==='hide'||act==='keep')&&reps){({error:err}=await S.sb.from('review_reports').delete().eq('review_id',id))}
+ if(!err)await S.sb.from('admin_actions').insert({action:{hide:'review_hide',show:'review_show',keep:'reports_dismiss'}[act],target:'review:'+id,details:{reports:reps}});
+ A.busy[id]=false;
+ if(err){alertMsg("L'action n'a pas marché, réessaie.");drawAdmin();return}
+ await loadAdminReviews();loadStats();Object.keys(GAMES).forEach(k=>{if(S.loaded[k])loadReviews(k)});
+}
+function alertMsg(t){const el=$('#adm');if(el)el.insertAdjacentHTML('afterbegin',`<p class="rv-msg err" role="alert" style="margin-bottom:12px">${esc(t)}</p>`)}
+
+document.addEventListener('click',e=>{
+ const p=e.target.closest('[data-period]');if(p){A.period=p.dataset.period;A.stats=null;loadAdminStats();return}
+ const f=e.target.closest('[data-flt]');if(f){A.flt=f.dataset.flt;drawAdmin();return}
+ const g=e.target.closest('[data-fg]');if(g){A.fg=g.dataset.fg;drawAdmin();return}
+ const b=e.target.closest('[data-adm-act]');if(!b)return;
+ const a=b.dataset.admAct;
+ if(a==='reload'){openAdmin();return}
+ if(a==='hide'||a==='show'||a==='keep')modAct(a,b.dataset.id);
+});
+document.addEventListener('change',e=>{if(e.target.id==='adm-me'){A.me=e.target.checked;loadAdminStats()}});
 
 // navigation
 let timer=null,prev='';
@@ -795,6 +1041,7 @@ function show(){
  if(h==='studio'){view='accueil';scroll='#studio-section'}
  if(h.startsWith('jeu-')){tab='jeux';const gk=h.slice(4);if(GAMES[gk])loadReviews(gk)}
  if(h==='compte')drawAccount();
+ if(h==='admin'||h.startsWith('admin-')){view='admin';tab='admin';openAdmin()}
  if(h.startsWith('installer-')&&TARGETS[h.slice(10)]){target=h.slice(10);view='installer'}
  else if(h==='installer')target='store';
  if(view==='installer'){drawInstall();tab='installer'}
