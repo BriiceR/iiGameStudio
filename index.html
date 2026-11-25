@@ -188,6 +188,10 @@ ol.steps2 li::before{content:counter(s);font-family:var(--px);color:var(--lime);
 .home .ico{width:46px;height:46px}
 .home .ghost{background:#22132E}
 .note{margin-top:12px;font-size:13px;color:var(--muted)}
+.acct-card{background:var(--raised);border:1px solid var(--line);border-radius:var(--r-lg);padding:18px;display:grid;gap:14px;margin-bottom:16px}
+.acct-card h2{font-size:17px}
+.code-in{font-family:var(--px);letter-spacing:.3em;text-align:center}
+.rv-acts .warn{color:#FF5C7A}
 .link-box{font-size:14px;padding:12px;border-radius:var(--r);background:var(--bg);border:2px dashed var(--line);overflow-wrap:anywhere;margin-bottom:10px;user-select:all;-webkit-user-select:all}
 .allow{display:grid;gap:14px;background:var(--raised);border:1px solid var(--line);border-radius:var(--r-lg);padding:16px;margin-bottom:24px}
 .grp{margin-bottom:22px}
@@ -412,6 +416,7 @@ ol.steps2 li::before{content:counter(s);font-family:var(--px);color:var(--lime);
 <symbol id="i-back" viewBox="0 0 8 8"><path fill="currentColor" d="M3 0h1v1h-1zM2 1h2v1h-2zM1 2h7v1h-7zM0 3h8v1h-8zM1 4h7v1h-7zM2 5h2v1h-2zM3 6h1v1h-1z"/></symbol>
 <symbol id="i-play" viewBox="0 0 8 8"><path fill="currentColor" d="M0 0h2v1h-2zM0 1h4v1h-4zM0 2h6v1h-6zM0 3h8v1h-8zM0 4h8v1h-8zM0 5h6v1h-6zM0 6h4v1h-4zM0 7h2v1h-2z"/></symbol>
 <symbol id="i-star" viewBox="0 0 8 8"><path fill="currentColor" d="M3 0h2v1h-2zM3 1h2v1h-2zM2 2h4v1h-4zM0 3h8v1h-8zM1 4h6v1h-6zM2 5h4v1h-4zM1 6h6v1h-6zM0 7h2v1h-2zM6 7h2v1h-2z"/></symbol>
+<symbol id="i-user" viewBox="0 0 8 8"><path fill="currentColor" d="M2 0h4v1h-4zM2 1h4v1h-4zM2 2h4v1h-4zM3 3h2v1h-2zM1 4h6v1h-6zM0 5h8v1h-8zM0 6h8v1h-8zM0 7h8v1h-8z"/></symbol>
 </defs></svg>
 
 <header class="top"><div class="wrap">
@@ -419,6 +424,7 @@ ol.steps2 li::before{content:counter(s);font-family:var(--px);color:var(--lime);
 <nav class="nav-d" aria-label="Navigation principale">
 <a href="#jeux" data-nav="jeux">JEUX</a>
 <a href="#studio" data-nav="studio">LE STUDIO</a>
+<a href="#compte" data-nav="compte" id="nav-compte">COMPTE</a>
 </nav>
 <a href="#installer" class="btn sm hide-sa"><svg class="pi" viewBox="0 0 8 8" aria-hidden="true"><use href="#i-dl"/></svg>INSTALLER</a>
 </div></header>
@@ -480,6 +486,13 @@ ol.steps2 li::before{content:counter(s);font-family:var(--px);color:var(--lime);
 </div>
 </div></div>
 
+<!-- COMPTE -->
+<div class="view" id="v-compte"><div class="wrap page">
+<a class="back" href="#accueil"><svg class="pi" viewBox="0 0 8 8" aria-hidden="true"><use href="#i-back"/></svg>ACCUEIL</a>
+<h1 class="px">Mon compte</h1>
+<div id="acct"></div>
+</div></div>
+
 <!-- CONFIDENTIALITE -->
 <div class="view" id="v-confidentialite"><div class="wrap page legal">
 <a class="back" href="#accueil"><svg class="pi" viewBox="0 0 8 8" aria-hidden="true"><use href="#i-back"/></svg>ACCUEIL</a>
@@ -509,7 +522,7 @@ ol.steps2 li::before{content:counter(s);font-family:var(--px);color:var(--lime);
 <nav class="tabbar" aria-label="Onglets">
 <a href="#accueil" data-tab="accueil"><svg class="pi" viewBox="0 0 8 8" aria-hidden="true"><use href="#i-home"/></svg>Accueil</a>
 <a href="#jeux" data-tab="jeux"><svg class="pi" viewBox="0 0 8 8" aria-hidden="true"><use href="#i-grid"/></svg>Jeux</a>
-<a href="#studio" data-tab="studio"><svg class="pi" viewBox="0 0 8 8" aria-hidden="true"><use href="#i-info"/></svg>Studio</a>
+<a href="#compte" data-tab="compte"><svg class="pi" viewBox="0 0 8 8" aria-hidden="true"><use href="#i-user"/></svg>Compte</a>
 <a href="#installer" data-tab="installer"><svg class="pi" viewBox="0 0 8 8" aria-hidden="true"><use href="#i-dl"/></svg>Installer</a>
 </nav>
 
@@ -530,16 +543,17 @@ ol.steps2 li::before{content:counter(s);font-family:var(--px);color:var(--lime);
 </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
 <script>
 const IMG={'ntd-titre':'/img/ntd-titre.webp','ntd-menu':'/img/ntd-menu.webp','ntd-carte':'/img/ntd-carte.webp','vertical-jeu':'/img/vertical-jeu.webp','icon-ntd':'/img/icon-ntd.svg','icon-vertical':'/img/icon-slime.svg'};
 {
 const GAMES={
- ntd:{url:'/ntd/',name:'Nine Tiles Dungeon',tag:'JOUABLE',short:'Die and retry de donjon sur neuf cases.',img:'ntd-titre',icon:'icon-ntd',shots:['ntd-menu','ntd-titre','ntd-carte'],
+ ntd:{url:'/ntd/',db:'ntd',name:'Nine Tiles Dungeon',tag:'JOUABLE',short:'Die and retry de donjon sur neuf cases.',img:'ntd-titre',icon:'icon-ntd',shots:['ntd-menu','ntd-titre','ntd-carte'],
   lead:"Neuf cases. Cinq niveaux. Beaucoup de morts. Des monstres, des coffres qui cachent des pouvoirs, et un donjon qui ne pardonne rien.",
   kind:'DIE AND RETRY',
   steps:[["Avance case par case","Chaque coup compte. Pas d'aperçu : c'est à toi d'anticiper."],["Ouvre les coffres","Dix pouvoirs à trouver : foudre, glace, aimant, sangsue…"],["Bats les gardiens","Cinq chapitres de dix niveaux, un gardien au bout de chacun."]],
   facts:[['GENRE','Die and retry, donjon'],['CONTENU','5 chapitres, défi du jour, mode sans fin'],['OÙ JOUER','Navigateur, téléphone ou ordi'],['PRIX','Gratuit']]},
- vertical:{url:'/slime/',name:'Slime Vertical',tag:'JOUABLE',short:'Saute, ramasse les pièces, monte le plus haut possible.',img:'vertical-jeu',icon:'icon-vertical',shots:['vertical-jeu','vertical-jeu','vertical-jeu'],
+ vertical:{url:'/slime/',db:'slime',name:'Slime Vertical',tag:'JOUABLE',short:'Saute, ramasse les pièces, monte le plus haut possible.',img:'vertical-jeu',icon:'icon-vertical',shots:['vertical-jeu','vertical-jeu','vertical-jeu'],
   lead:"Un slime bleu, des plates-formes au hasard et un seul but : monter. Si tu sors de l'écran, c'est fini. Ton score, c'est ta hauteur.",
   kind:'PLATE-FORME',
   steps:[["Saute de plate-forme en plate-forme","Gauche, droite, saut. Les plates-formes sont toujours atteignables… de justesse."],["Ramasse les pièces","Elles restent à toi même quand tu tombes."],["Dépense-les au magasin","Cœur, saut plus grand, vitesse, fusée : de quoi battre ton record."]],
@@ -555,7 +569,7 @@ const pat=['v','v','v','v','v','v','n','v','n','v','n','w','w','w','w','n','l','
 $('#band').innerHTML=Array.from({length:150},(_,i)=>{const r=Math.floor(i/50),c=i%50,t=pat[(c+r*7)%pat.length];return `<i class="${t==='v'?'':t}"></i>`}).join('');
 
 // liste des jeux
-const card=k=>{const g=GAMES[k];return `<a class="card" href="#jeu-${k}"><div class="thumb" aria-hidden="true">${phone(g.img)}</div><div class="body">${ico(g.icon)}<div class="meta"><h3>${g.name}</h3><p>${g.short}</p></div><span class="get" aria-hidden="true">JOUER</span></div></a>`};
+const card=k=>{const g=GAMES[k];return `<a class="card" href="#jeu-${k}"><div class="thumb" aria-hidden="true">${phone(g.img)}</div><div class="body">${ico(g.icon)}<div class="meta"><h3>${g.name}</h3><p>${g.short}</p><span class="rate" data-rate="${k}"></span></div><span class="get" aria-hidden="true">JOUER</span></div></a>`};
 const mys=`<div class="card mys"><div class="thumb q" aria-hidden="true"><span>?</span></div><div class="body"><span class="ico q" aria-hidden="true">?</span><div class="meta"><h3>???</h3><p>En développement. On n'en dit pas plus.</p></div><span class="get" aria-hidden="true">BIENTÔT</span></div></div>`;
 $('#grid').innerHTML=card('ntd')+card('vertical')+mys+mys+mys;
 
@@ -564,7 +578,7 @@ for(const k in GAMES){const g=GAMES[k];
  $('#v-jeu-'+k).innerHTML=`<div class="gp wrap">
  <a class="back" href="#jeux">${pi('back')}TOUS LES JEUX</a>
  <div class="gp-top">
-  <div class="gp-head">${ico(g.icon)}<div><h1 class="px">${g.name}</h1><div class="row"><span class="tag new">${g.tag}</span><span class="tag">${g.kind}</span></div></div></div>
+  <div class="gp-head">${ico(g.icon)}<div><h1 class="px">${g.name}</h1><div class="row"><span class="tag new">${g.tag}</span><span class="tag">${g.kind}</span></div><button class="rate-chip" type="button" data-go="avis-${k}"><span class="rate" data-rate="${k}"></span></button></div></div>
   <div class="shots" aria-label="Captures du jeu">${g.shots.map((s,i)=>phone(s,i===1?'mid':'')).join('')}</div>
   <div class="gp-info">
    <p class="lead1">${g.lead}</p>
@@ -575,6 +589,8 @@ for(const k in GAMES){const g=GAMES[k];
  </div>
  <h2 class="px s">Comment ça marche</h2>
  <div class="steps">${g.steps.map((s,i)=>`<div class="step"><b>0${i+1}</b><h3>${s[0]}</h3><p>${s[1]}</p></div>`).join('')}</div>
+ <h2 class="px s" id="avis-${k}">Avis des joueurs</h2>
+ <div class="rv-zone"><div class="rv-left"><div class="rv-sum" data-sum="${k}"></div><div data-form="${k}"></div></div><div class="rv-list" data-list="${k}"></div></div>
  <h2 class="px s">Fiche du jeu</h2>
  <dl>${g.facts.map(f=>`<div><dt>${f[0]}</dt><dd>${f[1]}</dd></div>`).join('')}</dl>
  </div>
@@ -619,6 +635,138 @@ function drawInstall(){
 $('#pick').addEventListener('click',e=>{const b=e.target.closest('button');if(b){target=b.dataset.t;drawInstall()}});
 $('#dev').addEventListener('click',e=>{const b=e.target.closest('button');if(b){dev=b.dataset.d;drawInstall()}});
 
+// ---- V2 : comptes joueurs et avis (Supabase)
+const SB_URL='https://jadmpivrytjqcdnqtxik.supabase.co';
+const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImphZG1waXZyeXRqcWNkbnF0eGlrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTU1NTAwNTgsImV4cCI6MjExMTEyNjA1OH0.iajubDq4JD36Ojfkk11JF-ec1OE8sFrBSBqy67aMS1k';
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmt=n=>Number(n).toFixed(1).replace('.',',');
+const starRow=n=>`<span class="stars" aria-label="${fmt(n)} sur 5">${[1,2,3,4,5].map(i=>`<svg class="pi${i<=Math.round(n)?' on':''}" viewBox="0 0 8 8" aria-hidden="true"><use href="#i-star"/></svg>`).join('')}</span>`;
+const S={sb:null,session:null,profile:null,stats:{},reviews:{},loaded:{},draft:{},editing:{},busy:{},msg:{},report:null,reported:{},login:{step:'email',email:'',busy:false,msg:null}};
+const uid=()=>S.session?.user?.id||null;
+try{if(window.supabase)S.sb=window.supabase.createClient(SB_URL,SB_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,flowType:'pkce'}})}catch(e){S.sb=null}
+
+async function loadProfile(){
+ if(!S.sb||!uid()){S.profile=null;return}
+ const {data}=await S.sb.from('profiles').select('display_name,role').eq('id',uid()).maybeSingle();
+ S.profile=data||{display_name:'Joueur',role:'player'};
+}
+async function loadStats(){
+ if(!S.sb)return;
+ const {data,error}=await S.sb.from('game_rating_stats').select('*');
+ if(error)return;
+ S.stats={};(data||[]).forEach(r=>S.stats[r.game_id]=r);drawRates();
+}
+async function loadReviews(k){
+ if(!S.sb){drawReviews(k);return}
+ const db=GAMES[k].db;
+ const {data,error}=await S.sb.from('reviews').select('id,game_id,user_id,rating,comment,status,created_at,profiles(display_name)').eq('game_id',db).order('created_at',{ascending:false}).limit(50);
+ S.loaded[k]=error?'err':true;S.reviews[k]=data||[];drawReviews(k);
+}
+function drawRates(){
+ document.querySelectorAll('[data-rate]').forEach(el=>{const s=S.stats[GAMES[el.dataset.rate].db];el.innerHTML=s&&s.reviews_count?`<svg class="pi" viewBox="0 0 8 8" aria-hidden="true"><use href="#i-star"/></svg><b>${fmt(s.rating_avg)}</b> · ${s.reviews_count} avis`:''});
+}
+function drawReviews(k,force){
+ const sum=document.querySelector(`[data-sum="${k}"]`),form=document.querySelector(`[data-form="${k}"]`),list=document.querySelector(`[data-list="${k}"]`);
+ if(!sum)return;
+ if(!S.sb){sum.innerHTML='';form.innerHTML='';list.innerHTML='<div class="rv-empty">Les avis ne sont pas disponibles pour le moment.</div>';return}
+ if(!S.loaded[k]){sum.innerHTML='<p class="rv-msg">Chargement des avis…</p>';form.innerHTML='';list.innerHTML='';return}
+ if(S.loaded[k]==='err'){sum.innerHTML='';form.innerHTML='';list.innerHTML='<div class="rv-empty">Les avis ne sont pas joignables pour l\'instant.</div>';return}
+ const st=S.stats[GAMES[k].db]||{reviews_count:0,rating_avg:0,r5:0,r4:0,r3:0,r2:0,r1:0},c=st.reviews_count;
+ sum.innerHTML=`<div class="rv-avg"><strong>${c?fmt(st.rating_avg):'–'}</strong>${starRow(st.rating_avg||0)}<small>${c} avis</small></div><div class="rv-bars">${[5,4,3,2,1].map(n=>{const v=st['r'+n]||0;return `<div class="rv-bar"><span>${n}</span><i><span style="width:${c?Math.round(v/c*100):0}%"></span></i><em>${v}</em></div>`}).join('')}</div>`;
+ const all=S.reviews[k]||[],mine=all.find(r=>r.user_id===uid());
+ const typing=!force&&form.querySelector('form')&&form.contains(document.activeElement);
+ if(typing){}
+ else if(!uid()){form.innerHTML=`<div class="rv-form"><h3>Donne ton avis</h3><p class="rv-msg">Connecte-toi pour noter ${esc(GAMES[k].name)}. Pas de mot de passe : un e-mail suffit.</p><a class="btn wide" href="#compte">${pi('user')}SE CONNECTER</a></div>`}
+ else if(mine&&!S.editing[k]){form.innerHTML=`<div class="rv-form"><h3>Ton avis</h3>${starRow(mine.rating)}${mine.status==='masque'?'<p class="rv-msg err">Ton avis a été masqué par la modération.</p>':'<p class="rv-msg">Merci ! Tu peux le modifier quand tu veux.</p>'}<div class="rv-acts"><button type="button" data-act="edit" data-k="${k}">Modifier</button><button type="button" data-act="del" data-k="${k}" data-id="${mine.id}">Supprimer</button></div></div>`}
+ else{
+  const d=S.draft[k]||(mine?{note:mine.rating,texte:mine.comment||''}:{note:0,texte:''});S.draft[k]=d;
+  const name=S.profile?.display_name||'Joueur';
+  form.innerHTML=`<form class="rv-form" data-f="${k}" novalidate><h3>${mine?'Modifier ton avis':'Donne ton avis'}</h3>
+  <fieldset class="pickstars"><legend class="sr">Ta note sur 5</legend>${[1,2,3,4,5].map(i=>`<input class="sr" type="radio" name="n-${k}" id="n-${k}-${i}" value="${i}"${d.note===i?' checked':''}><label for="n-${k}-${i}" class="${i<=d.note?'on':''}" aria-label="${i} étoile${i>1?'s':''}"><svg class="pi" viewBox="0 0 8 8" aria-hidden="true"><use href="#i-star"/></svg></label>`).join('')}</fieldset>
+  <label class="sr" for="t-${k}">Ton commentaire</label><textarea id="t-${k}" maxlength="500" placeholder="Ce que tu as aimé, ce qui t'a rendu fou… (facultatif)">${esc(d.texte)}</textarea>
+  <div class="foot"><span class="count">${d.texte.length}/500</span><button class="btn" type="submit"${S.busy[k]?' disabled':''}>${S.busy[k]?'ENVOI…':'PUBLIER'}</button></div>
+  <p class="rv-msg" style="font-size:13px">Publié sous le nom <b>${esc(name)}</b> · <a href="#compte">modifier</a></p>
+  ${S.msg[k]?`<p class="rv-msg${S.msg[k].err?' err':''}" role="status">${esc(S.msg[k].t)}</p>`:''}</form>`;
+ }
+ list.innerHTML=all.length?all.map(r=>{const me=r.user_id===uid();const who=me?'Toi':(r.profiles?.display_name||'Un joueur');const rep=S.report===r.id;
+  return `<article class="rv${me?' mine':''}"><div class="rv-top"><span class="rv-who">${esc(who)}</span>${starRow(r.rating)}</div><span class="rv-date">${new Date(r.created_at).toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'})}${r.status==='masque'?' · masqué':''}</span>${r.comment?`<p>${esc(r.comment)}</p>`:''}
+  ${!me&&uid()?`<div class="rv-acts">${S.reported[r.id]?'<span class="rv-msg" style="font-size:13px;padding:12px 8px">Merci, c\'est signalé.</span>':rep?`<span class="rv-msg" style="font-size:13px;padding:12px 8px">Signaler cet avis ?</span><button type="button" class="warn" data-act="rep-yes" data-k="${k}" data-id="${r.id}">Oui</button><button type="button" data-act="rep-no" data-k="${k}">Non</button>`:`<button type="button" data-act="rep" data-k="${k}" data-id="${r.id}">Signaler</button>`}</div>`:''}</article>`}).join(''):`<div class="rv-empty">Aucun avis pour l'instant. Sois le premier à noter ${esc(GAMES[k].name)}.</div>`;
+}
+function drawAllReviews(){drawRates();Object.keys(GAMES).forEach(k=>drawReviews(k))}
+
+// Compte
+function drawAccount(){
+ const el=$('#acct');if(!el)return;
+ if(!S.sb){el.innerHTML='<div class="rv-empty">La connexion n\'est pas disponible pour le moment.</div>';return}
+ if(uid()){
+  const p=S.profile||{display_name:'Joueur'};
+  el.innerHTML=`<div class="acct-card"><h2>Ton pseudo</h2><p class="rv-msg">C'est le nom affiché sur tes avis.${p.display_name==='Joueur'?' Choisis-en un !':''}</p>
+  <form id="name-f" novalidate style="display:grid;gap:10px"><label class="sr" for="name-in">Pseudo</label><input id="name-in" class="field-in" maxlength="40" value="${esc(p.display_name)}" autocomplete="nickname" style="font:inherit;font-size:16px;color:var(--ink);background:var(--bg);border:2px solid var(--line);border-radius:var(--r);padding:12px"><button class="btn" type="submit">ENREGISTRER</button><p class="rv-msg" id="name-msg" role="status"></p></form></div>
+  <div class="acct-card"><h2>Connexion</h2><p class="rv-msg">Connecté avec ${esc(S.session.user.email)}.</p><button class="btn ghost" type="button" id="logout">SE DÉCONNECTER</button></div>
+  <p class="note">Pour supprimer ton compte et tes avis, écris à <a href="mailto:iigamestudio@gmail.com">iigamestudio@gmail.com</a>.</p>`;
+  return;
+ }
+ const L=S.login;
+ if(L.step==='email'){
+  el.innerHTML=`<p class="lead">Un compte sert à noter les jeux et laisser des avis. Pas de mot de passe : on t'envoie un e-mail.</p>
+  <form class="acct-card" id="mail-f" novalidate><label for="mail-in" class="rv-msg">Ton adresse e-mail</label><input id="mail-in" type="email" inputmode="email" autocomplete="email" required value="${esc(L.email)}" placeholder="toi@exemple.fr" style="font:inherit;font-size:16px;color:var(--ink);background:var(--bg);border:2px solid var(--line);border-radius:var(--r);padding:12px"><button class="btn wide" type="submit"${L.busy?' disabled':''}>${L.busy?'ENVOI…':'RECEVOIR MON CODE'}</button>${L.msg?`<p class="rv-msg${L.msg.err?' err':''}" role="status">${esc(L.msg.t)}</p>`:''}</form>`;
+ }else{
+  el.innerHTML=`<div class="acct-card"><h2>Regarde tes e-mails</h2><p class="rv-msg">On a envoyé un e-mail à <b>${esc(L.email)}</b>. Touche le lien dedans, ou tape ici le code qu'il contient. Si tu as installé l'appli, utilise le code.</p>
+  <form id="code-f" novalidate style="display:grid;gap:10px"><label class="sr" for="code-in">Code reçu par e-mail</label><input id="code-in" class="code-in" inputmode="numeric" autocomplete="one-time-code" maxlength="10" placeholder="••••••" style="font-size:26px;color:var(--ink);background:var(--bg);border:2px solid var(--line);border-radius:var(--r);padding:12px"><button class="btn wide" type="submit"${L.busy?' disabled':''}>${L.busy?'VÉRIFICATION…':'VALIDER'}</button>${L.msg?`<p class="rv-msg${L.msg.err?' err':''}" role="status">${esc(L.msg.t)}</p>`:''}</form>
+  <div class="rv-acts"><button type="button" id="back-mail">Changer d'adresse</button><button type="button" id="resend">Renvoyer l'e-mail</button></div></div>
+  <p class="note">Rien reçu ? Regarde dans les spams. L'e-mail vient de Supabase, le service qui gère les comptes.</p>`;
+ }
+}
+document.addEventListener('submit',async e=>{
+ const f=e.target;
+ if(f.id==='mail-f'){e.preventDefault();const em=$('#mail-in').value.trim();if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em)){S.login.msg={t:'Cette adresse ne semble pas valide.',err:true};drawAccount();return}
+  S.login={...S.login,email:em,busy:true,msg:null};drawAccount();
+  try{sessionStorage.setItem('iig-login','1')}catch(_){}
+  const {error}=await S.sb.auth.signInWithOtp({email:em,options:{emailRedirectTo:location.origin+'/'}});
+  S.login.busy=false;if(error){S.login.msg={t:/rate|limit|seconds/i.test(error.message)?"Trop d'e-mails envoyés : patiente une minute et réessaie.":"L'envoi n'a pas marché, réessaie.",err:true}}else{S.login.step='code'}drawAccount();if(!error)$('#code-in')?.focus();return}
+ if(f.id==='code-f'){e.preventDefault();const code=$('#code-in').value.replace(/\D/g,'');if(code.length<6){S.login.msg={t:'Tape le code à 6 chiffres reçu par e-mail.',err:true};drawAccount();return}
+  S.login.busy=true;S.login.msg=null;drawAccount();
+  const {error}=await S.sb.auth.verifyOtp({email:S.login.email,token:code,type:'email'});
+  S.login.busy=false;if(error){S.login.msg={t:'Code incorrect ou expiré. Vérifie-le, ou renvoie un e-mail.',err:true};drawAccount()}return}
+ if(f.id==='name-f'){e.preventDefault();const v=$('#name-in').value.trim().slice(0,40);if(!v){$('#name-msg').textContent='Le pseudo ne peut pas être vide.';return}
+  const {error}=await S.sb.from('profiles').update({display_name:v}).eq('id',uid());
+  if(error){$('#name-msg').textContent="L'enregistrement n'a pas marché, réessaie.";return}
+  S.profile={...S.profile,display_name:v};$('#name-msg').textContent='Pseudo enregistré.';Object.keys(GAMES).forEach(k=>{if(S.loaded[k])loadReviews(k)});return}
+ const rf=f.closest&&f.closest('form[data-f]');
+ if(rf){e.preventDefault();const k=rf.dataset.f,d=S.draft[k];
+  if(!d.note){S.msg[k]={t:'Choisis une note de 1 à 5 étoiles.',err:true};drawReviews(k,true);return}
+  S.busy[k]=true;S.msg[k]=null;drawReviews(k,true);
+  const {error}=await S.sb.from('reviews').upsert({game_id:GAMES[k].db,user_id:uid(),rating:d.note,comment:d.texte.trim().slice(0,500)},{onConflict:'game_id,user_id'});
+  S.busy[k]=false;
+  if(error){S.msg[k]={t:"L'envoi n'a pas marché, réessaie.",err:true};drawReviews(k,true);return}
+  S.editing[k]=false;S.draft[k]=null;await Promise.all([loadReviews(k),loadStats()]);drawReviews(k,true)}
+});
+document.addEventListener('input',e=>{const f=e.target.closest('form[data-f]');if(!f)return;const k=f.dataset.f,d=S.draft[k];
+ if(e.target.type==='radio'){d.note=+e.target.value;f.querySelectorAll('.pickstars label').forEach((l,i)=>l.classList.toggle('on',i<d.note));S.msg[k]=null}
+ if(e.target.tagName==='TEXTAREA'){d.texte=e.target.value.slice(0,500);f.querySelector('.count').textContent=d.texte.length+'/500'}});
+document.addEventListener('click',async e=>{
+ const go=e.target.closest('[data-go]');if(go){document.getElementById(go.dataset.go)?.scrollIntoView({behavior:'smooth'});return}
+ if(e.target.id==='logout'){await S.sb.auth.signOut();return}
+ if(e.target.id==='back-mail'){S.login={step:'email',email:S.login.email,busy:false,msg:null};drawAccount();return}
+ if(e.target.id==='resend'){const {error}=await S.sb.auth.signInWithOtp({email:S.login.email,options:{emailRedirectTo:location.origin+'/'}});S.login.msg=error?{t:"Patiente une minute avant de renvoyer.",err:true}:{t:'E-mail renvoyé.'};drawAccount();return}
+ const b=e.target.closest('[data-act]');if(!b)return;const k=b.dataset.k,a=b.dataset.act;
+ if(a==='edit'){S.editing[k]=true;drawReviews(k,true);return}
+ if(a==='del'){b.disabled=true;const {error}=await S.sb.from('reviews').delete().eq('id',b.dataset.id);if(!error){S.editing[k]=false;S.draft[k]=null;await Promise.all([loadReviews(k),loadStats()])}else b.disabled=false;return}
+ if(a==='rep'){S.report=b.dataset.id;drawReviews(k,true);return}
+ if(a==='rep-no'){S.report=null;drawReviews(k,true);return}
+ if(a==='rep-yes'){const id=b.dataset.id;b.disabled=true;const {error}=await S.sb.from('review_reports').insert({review_id:id,reporter_id:uid()});if(!error||error.code==='23505')S.reported[id]=true;S.report=null;drawReviews(k,true)}
+});
+if(S.sb){
+ S.sb.auth.onAuthStateChange((ev,session)=>{
+  S.session=session;
+  setTimeout(async()=>{await loadProfile();drawAccount();drawAllReviews();Object.keys(GAMES).forEach(k=>{if(S.loaded[k])loadReviews(k)});
+   if(ev==='SIGNED_IN'){S.login={step:'email',email:'',busy:false,msg:null};let fromLink=false;try{fromLink=sessionStorage.getItem('iig-login')==='1';sessionStorage.removeItem('iig-login')}catch(_){}if(fromLink&&location.hash!=='#compte')location.hash='#compte'}
+   const nc=$('#nav-compte');if(nc)nc.textContent=uid()?(S.profile?.display_name||'Compte').slice(0,16):'COMPTE';
+  },0);
+ });
+ loadStats();
+}
+
 // navigation
 let timer=null,prev='';
 function setTab(t){
@@ -642,7 +790,8 @@ function show(){
  let view=h,scroll=null,tab=h;
  if(h==='jeux'){view='accueil';scroll='#jeux-section'}
  if(h==='studio'){view='accueil';scroll='#studio-section'}
- if(h.startsWith('jeu-'))tab='jeux';
+ if(h.startsWith('jeu-')){tab='jeux';const gk=h.slice(4);if(GAMES[gk])loadReviews(gk)}
+ if(h==='compte')drawAccount();
  if(h.startsWith('installer-')&&TARGETS[h.slice(10)]){target=h.slice(10);view='installer'}
  else if(h==='installer')target='store';
  if(view==='installer'){drawInstall();tab='installer'}
