@@ -497,17 +497,20 @@ ol.steps2 li::before{content:counter(s);font-family:var(--px);color:var(--lime);
 <div class="view" id="v-confidentialite"><div class="wrap page legal">
 <a class="back" href="#accueil"><svg class="pi" viewBox="0 0 8 8" aria-hidden="true"><use href="#i-back"/></svg>ACCUEIL</a>
 <h1 class="px">Confidentialité</h1>
-<p class="lead">En bref : pas de compte, pas de pub, pas de suivi. Ta progression reste sur ton appareil.</p>
-<h2>Ce qu'on collecte</h2>
-<p>Rien. Le site ne pose aucun cookie, ne compte pas les visites et ne demande aucune information personnelle. Comme pour tout site, l'hébergeur garde des journaux techniques de connexion pour faire fonctionner le service et le protéger.</p>
+<p class="lead">En bref : pas de pub, pas de cookie, rien de revendu. Le compte est facultatif.</p>
+<h2>Ce qu'on mesure</h2>
+<p>Le site compte les visites et les parties pour savoir quels jeux plaisent. Pour chaque événement (visite, partie lancée, installation, temps de jeu), on garde le jeu concerné, le type d'appareil (iPhone, Android ou ordinateur, site ou appli installée) et l'heure. Chaque visite reçoit un numéro tiré au hasard, oublié dès que tu fermes l'onglet : on ne peut pas te reconnaître d'une visite à l'autre. Il n'y a ni cookie ni outil de mesure extérieur. Comme pour tout site, l'hébergeur garde aussi des journaux techniques de connexion pour faire fonctionner le service et le protéger.</p>
+<h2>Ton compte, si tu en crées un</h2>
+<p>On garde ton adresse e-mail (pour t'envoyer ton code de connexion), ton pseudo, tes notes et tes avis, et les parties que tu lances quand tu es connecté. Tes avis sont publics avec ton pseudo ; ton adresse e-mail n'est jamais affichée. Pour supprimer ton compte et tout ce qui va avec, écris à <a href="mailto:iigamestudio@gmail.com">iigamestudio@gmail.com</a>.</p>
 <h2>Ce qui reste sur ton appareil</h2>
-<p>Ta progression dans les jeux (niveaux, pièces, records, réglages) est enregistrée dans ton navigateur ou dans l'appli installée. Elle ne quitte pas ton téléphone ou ton ordinateur. Pour l'effacer, supprime les données du site dans ton navigateur, ou désinstalle l'appli.</p>
+<p>Ta progression dans les jeux (niveaux, pièces, records, réglages) et ta connexion au compte sont enregistrées dans ton navigateur ou dans l'appli installée. Pour les effacer, supprime les données du site dans ton navigateur, ou désinstalle l'appli.</p>
 <h2>Publicité et achats</h2>
 <p>Il n'y a ni publicité ni achat. Si ça change un jour, cette page sera mise à jour avant.</p>
 <h2>Éditeur</h2>
 <p>iiGameStudio, projet personnel non professionnel. Contact : <a href="mailto:iigamestudio@gmail.com">iigamestudio@gmail.com</a></p>
 <h2>Hébergement</h2>
 <p>Vercel Inc., 440 N Barranca Ave #4133, Covina, CA 91723, États-Unis.</p>
+<p>Comptes, avis et mesure d'audience : Supabase, serveurs en Irlande (Union européenne). Les e-mails de connexion partent de Gmail (Google).</p>
 </div></div>
 
 
@@ -809,5 +812,6 @@ addEventListener('pageshow',e=>{if(e.persisted)show()});
 if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('/sw.js',{scope:'/'}).catch(()=>{}));
 }
 </script>
+<script src="/track.js" defer></script>
 </body>
 </html>

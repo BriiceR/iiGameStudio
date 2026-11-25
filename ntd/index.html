@@ -3784,6 +3784,7 @@ if(hot&&hot.ready) hot.ready(demarrer); else demarrer((hot&&hot.data)||{});
 </script>
 
 <script>if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('/ntd/sw.js',{scope:'/ntd/'}).catch(()=>{}));</script>
+<script src="/track.js" defer data-game="ntd"></script>
 <!-- Retour au store iiGameStudio : onglet sur le bord gauche, seulement quand le jeu est lancé depuis l'appli du store. Glisser pour le déplacer, toucher pour revenir au store. -->
 <style>#iig-back{position:fixed;z-index:2147483000;left:0;top:45%;width:24px;height:56px;display:flex;align-items:center;justify-content:center;border-radius:0 10px 10px 0;background:#7E2CA3;box-shadow:0 2px 10px rgba(0,0,0,.45),inset -1px 0 0 rgba(255,255,255,.18);opacity:.9;touch-action:none;-webkit-user-select:none;user-select:none;cursor:pointer;transition:width .15s}#iig-back svg{width:16px;height:16px;pointer-events:none}#iig-back:active{width:28px;opacity:1}</style>
 <script>(function(){try{var p=new URLSearchParams(location.search);if(p.has('store'))sessionStorage.setItem('iig-store','1');if(sessionStorage.getItem('iig-store')!=='1')return;
