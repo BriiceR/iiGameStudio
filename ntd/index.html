@@ -1,4 +1,5 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><script src="/cloud.js"></script>
+</head><body>
 <title>Nine Tiles Dungeon</title>
 <link rel="manifest" href="/ntd/manifest.webmanifest">
 <meta name="theme-color" content="#17111d">
@@ -949,7 +950,7 @@ h3{margin-top:12px}
         <div class="reglage"><div><strong>Mode test</strong><small id="etat-test">Ouvre tous les niveaux, ajoute 10 000 or et 100 diamants.</small></div><button type="button" class="discret" id="mode-test" data-test="1">Activer</button></div>
         <h3>Sauvegarde</h3>
         <div class="reglage"><div><strong>Sur cet appareil</strong><small>Enregistrée à chaque coup, descente en cours comprise.</small></div><span class="acquis">Active</span></div>
-        <div class="reglage"><div><strong>En ligne</strong><small id="etat-nuage">Recherche en cours…</small></div><span></span></div>
+        <div class="reglage"><div><strong>En ligne</strong><small id="etat-nuage">Recherche en cours…</small></div><span id="nuage-act"></span></div>
         <h3>Remise à zéro</h3>
         <div class="reglage"><div><strong>Abandonner la descente</strong><small>Ton or rejoint le trésor et la descente en cours s'arrête</small></div><button type="button" class="discret" id="raz-descente" data-raz="descente">Abandonner</button></div>
         <div class="reglage"><div><strong>Oublier les positions</strong><small>Le mode sans fin de chaque chapitre repart de l'étage 1. Rien d'autre ne change</small></div><button type="button" class="discret" id="raz-position" data-raz="position">Oublier</button></div>
@@ -1573,9 +1574,12 @@ function pousserNuage(){
 }
 function majEtatNuage(){
   const el=document.getElementById('etat-nuage'); if(!el) return;
-  el.textContent=nuageEtat==='ok'?'Active : ta progression suit ton compte Claude, sur tous tes appareils.'
+  el.textContent=nuageEtat==='ok'?'Active : ta progression suit ton compte iiGameStudio, sur tous tes appareils.'
     :nuageEtat==='attente'?'Recherche en cours…'
-    :"Bientôt : pour l'instant, ta progression reste sur cet appareil, dans ce navigateur.";
+    :nuageEtat==='deco'?'Connecte-toi pour retrouver ta progression sur tous tes appareils.'
+    :"Indisponible pour l'instant : ta progression reste sur cet appareil.";
+  const act=document.getElementById('nuage-act');
+  if(act) act.innerHTML=nuageEtat==='ok'?'<span class="acquis">Active</span>':nuageEtat==='deco'?'<button type="button" class="discret" id="nuage-co">Connexion</button>':'';
 }
 function adopterNuage(d){
   record=Math.max(0,Math.floor(d.record)||0);
@@ -1605,12 +1609,11 @@ function noter(ok){
 }
 async function brancherNuage(){
   try{
-    if(!window.claude||!window.claude.use){ nuageEtat='refus'; majEtatNuage(); return; }
-    const db=await window.claude.use('db'), user=await window.claude.use('user');
-    const id=db&&user?await user.id():null;
-    if(!id){ nuageEtat='refus'; majEtatNuage(); return; }
-    try{ if(await user.isOwner()) journalCol=db.collection('journal'); }catch(e){}
-    const doc=db.doc('data/users/'+id+'/sauvegarde');
+    const C=window.iigCloud;
+    if(!C){ nuageEtat='refus'; majEtatNuage(); return; }
+    const u=await C.user();
+    if(!u){ nuageEtat='deco'; majEtatNuage(); return; }
+    const doc=C.doc('ntd');
     const snap=await doc.get();
     const d=snap.exists?JSON.parse(JSON.stringify(snap.data())):null;
     /* la copie en ligne l'emporte si elle est plus récente que ce que cet appareil avait à l'ouverture */
@@ -1625,6 +1628,11 @@ async function brancherNuage(){
     majEtatNuage();
   }catch(e){ nuageEtat='refus'; majEtatNuage(); }
 }
+/* bouton Connexion des réglages : fenêtre de connexion commune aux jeux iiGameStudio */
+document.addEventListener('click',e=>{
+  if(!e.target.closest||!e.target.closest('#nuage-co')||!window.iigCloud) return;
+  window.iigCloud.login().then(ok=>{ if(ok){ nuageEtat='attente'; majEtatNuage(); brancherNuage(); } });
+});
 function ecrireB(){ ecrire('crypte-boutique',JSON.stringify(B)); }
 function ecrireM(){ ecrire('crypte-meta',JSON.stringify(M)); }
 

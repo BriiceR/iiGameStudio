@@ -512,6 +512,12 @@ body:not(.is-admin) .adm-only{display:none!important}
 .mg .ft{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
 .mg .ft a:not(.btn){font-size:14px;color:var(--vtext)}
 .mg .ft .btn{min-height:44px}
+.mg-dl{margin:0;display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.mg-dl div{display:block;background:var(--stage);border-radius:var(--r);padding:10px 12px;text-align:left}
+.mg-dl dt,.mg-dl dd{display:block;text-align:left}
+.mg-dl dt{font-size:11px;color:var(--muted)}
+.mg-dl dd{margin:2px 0 0;font-family:var(--px);font-size:15px}
+.mg-sv{font-size:12px;color:var(--muted);margin-top:-6px}
 .mg .mine{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted)}
 .acc-list{background:var(--raised);border:1px solid var(--line);border-radius:var(--r-lg);display:flex;flex-direction:column;margin-bottom:12px}
 .acc-list>*{min-height:56px;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;border-top:1px solid var(--line);color:var(--ink);text-decoration:none;font:inherit;font-size:15px;background:none;border-left:0;border-right:0;border-bottom:0;text-align:left;width:100%;cursor:pointer}
@@ -635,7 +641,7 @@ body:not(.is-admin) .adm-only{display:none!important}
 <h2>Ce qu'on mesure</h2>
 <p>Le site compte les visites et les parties pour savoir quels jeux plaisent. Pour chaque événement (visite, partie lancée, installation, temps de jeu), on garde le jeu concerné, le type d'appareil (iPhone, Android ou ordinateur, site ou appli installée) et l'heure. Chaque visite reçoit un numéro tiré au hasard, oublié dès que tu fermes l'onglet : on ne peut pas te reconnaître d'une visite à l'autre. Il n'y a ni cookie ni outil de mesure extérieur. Comme pour tout site, l'hébergeur garde aussi des journaux techniques de connexion pour faire fonctionner le service et le protéger.</p>
 <h2>Ton compte, si tu en crées un</h2>
-<p>On garde ton adresse e-mail (pour t'envoyer ton code de connexion), ton pseudo, tes notes et tes avis, et les parties que tu lances quand tu es connecté. Tes avis sont publics avec ton pseudo et ton avatar ; ton adresse e-mail n'est jamais affichée. Dans l'onglet Compte, tu peux télécharger tes données et supprimer ton compte en un bouton : ton e-mail, ton pseudo et tes avis sont alors effacés, et tes parties restent dans les statistiques sans aucun lien avec toi.</p>
+<p>On garde ton adresse e-mail (pour t'envoyer ton code de connexion), ton pseudo et ton avatar, tes notes et tes avis, les parties que tu lances quand tu es connecté, et ta progression dans les jeux qui la sauvegardent en ligne. Tes avis sont publics avec ton pseudo et ton avatar ; ton adresse e-mail n'est jamais affichée. Dans l'onglet Compte, tu peux télécharger tes données et supprimer ton compte en un bouton : ton e-mail, ton pseudo et tes avis sont alors effacés, et tes parties restent dans les statistiques sans aucun lien avec toi.</p>
 <h2>Ce qui reste sur ton appareil</h2>
 <p>Ta progression dans les jeux (niveaux, pièces, records, réglages) et ta connexion au compte sont enregistrées dans ton navigateur ou dans l'appli installée. Pour les effacer, supprime les données du site dans ton navigateur, ou désinstalle l'appli.</p>
 <h2>Publicité et achats</h2>
@@ -1075,14 +1081,19 @@ function avaSvg(id,size){
  const a=AVA[id]||AVA['slime-lime'],sh=AVA_SHAPE[a[0]],eye=a[1]==='#7E2CA3'?'#F5EFFA':'#140A1C';
  return `<svg class="ava" width="${size}" height="${size}" viewBox="0 0 8 8" shape-rendering="crispEdges" aria-hidden="true"><path fill="${a[1]}" d="${sh[0]}"/><path fill="${eye}" d="${sh[1]}"/></svg>`;
 }
-const M={games:null,reviews:[],err:false,edit:false,ava:null,busy:false,msg:null,del:false,delBusy:false,delErr:null,expBusy:false};
+/* progression lue dans la sauvegarde en ligne de chaque jeu */
+const PROG={
+ ntd:d=>{const n=d&&d.M&&d.M.niv||{};const sous=Object.values(n).reduce((a,v)=>a+Math.min(10,Number(v&&v.sous)||0),0);return[['Niveaux finis',sous+' / 50'],['Record',nf(d.record||0)+' or']]}
+};
+const M={saves:{},games:null,reviews:[],err:false,edit:false,ava:null,busy:false,msg:null,del:false,delBusy:false,delErr:null,expBusy:false};
 
 async function loadMine(){
  if(!S.sb||!uid())return;
  const [g,r]=await Promise.all([
   S.sb.rpc('my_games'),
-  S.sb.from('reviews').select('id,game_id,rating,comment,status,created_at,updated_at').eq('user_id',uid())
- ]);
+  S.sb.from('reviews').select('id,game_id,rating,comment,status,created_at,updated_at').eq('user_id',uid()),
+  S.sb.from('saves').select('game_id,updated_at,data').eq('user_id',uid())
+ ]).then(a=>{M.saves={};(a[2].data||[]).forEach(x=>M.saves[x.game_id]=x);return a});
  M.err=!!(g.error||r.error);
  M.games={};(g.data||[]).forEach(x=>M.games[x.game_id]=x);
  M.reviews=r.data||[];
@@ -1107,14 +1118,16 @@ function drawMyGames(){
  return `<div class="mg">${Object.keys(GAMES).map(k=>{const g=GAMES[k],s=M.games[g.db],rv=M.reviews.find(r=>r.game_id===g.db);
   const sub=s&&s.launches?`${nf(s.launches)} partie${s.launches>1?'s':''} · dernière ${ago(s.last_at)}${s.play_s?' · '+dur(s.play_s)+' de jeu':''}`:'Pas encore joué avec ton compte';
   const note=rv?`<span class="mine">Ta note ${starRow(rv.rating)}</span>`:`<a href="#jeu-${k}">Donner ma note</a>`;
-  return `<article><div class="hd"><img src="${IMG[g.icon]}" alt=""><div><h3>${esc(g.name)}</h3><p>${sub}</p></div></div><div class="ft">${note}<a class="btn sm" href="#lancement-${k}">${pi('play')}JOUER</a></div></article>`}).join('')}</div>
- <p class="note">Tes parties sont comptées quand tu joues connecté. Ta progression dans les jeux reste pour l'instant sur cet appareil.</p>`;
+  const sv=M.saves[g.db],pr=sv&&PROG[g.db]?PROG[g.db](sv.data):null;
+  const cells=pr?`<dl class="mg-dl">${pr.map(([t,v])=>`<div><dt>${t}</dt><dd>${esc(v)}</dd></div>`).join('')}</dl><p class="mg-sv">Sauvegardé en ligne ${ago(sv.updated_at)}</p>`:'';
+  return `<article><div class="hd"><img src="${IMG[g.icon]}" alt=""><div><h3>${esc(g.name)}</h3><p>${sub}</p></div></div>${cells}<div class="ft">${note}<a class="btn sm" href="#lancement-${k}">${pi('play')}JOUER</a></div></article>`}).join('')}</div>
+ <p class="note">Tes parties sont comptées quand tu joues connecté. Nine Tiles Dungeon sauvegarde ta progression sur ton compte : tu la retrouves sur tous tes appareils. Les autres jeux suivent bientôt.</p>`;
 }
 
 function drawLoggedIn(el){
  const tot=Object.values(M.games||{}).reduce((a,x)=>({l:a.l+Number(x.launches||0),t:a.t+Number(x.play_s||0)}),{l:0,t:0});
  const adm=S.profile?.role==='admin'?`<a class="adm-alert" href="#admin" style="margin:0 0 12px;background:var(--raised);border-color:var(--line)"><svg class="pi" viewBox="0 0 8 8" aria-hidden="true" style="color:var(--vtext)"><use href="#i-chart"/></svg><span><b>Espace admin</b>Tableau de bord, modération, joueurs</span><span aria-hidden="true" style="flex:0;font-size:20px">›</span></a>`:'';
- const del=M.del?`<div class="del-box" role="alertdialog" aria-labelledby="del-t"><p id="del-t"><b>Supprimer ton compte ?</b><br>Ton pseudo, ton adresse e-mail et tes avis sont effacés pour de bon. Tes parties restent dans les statistiques, mais sans lien avec toi. Ta progression sur cet appareil n'est pas touchée.</p><div class="row2"><button class="btn ghost" type="button" data-acc="del-no">ANNULER</button><button class="btn red" type="button" data-acc="del-yes"${M.delBusy?' disabled':''}>${M.delBusy?'…':'TOUT SUPPRIMER'}</button></div>${M.delErr?`<p class="rv-msg err" role="alert">${esc(M.delErr)}</p>`:''}</div>`
+ const del=M.del?`<div class="del-box" role="alertdialog" aria-labelledby="del-t"><p id="del-t"><b>Supprimer ton compte ?</b><br>Ton pseudo, ton adresse e-mail, tes avis et ta progression en ligne sont effacés pour de bon. Tes parties restent dans les statistiques, mais sans lien avec toi. Ta progression sur cet appareil n'est pas touchée.</p><div class="row2"><button class="btn ghost" type="button" data-acc="del-no">ANNULER</button><button class="btn red" type="button" data-acc="del-yes"${M.delBusy?' disabled':''}>${M.delBusy?'…':'TOUT SUPPRIMER'}</button></div>${M.delErr?`<p class="rv-msg err" role="alert">${esc(M.delErr)}</p>`:''}</div>`
   :`<button class="btn danger wide" type="button" data-acc="del">SUPPRIMER MON COMPTE</button>`;
  el.innerHTML=`${drawProfile()}
  <div class="tiles" aria-label="Mes chiffres"><div><b>${M.games?nf(tot.l):'–'}</b><span>parties</span></div><div><b>${M.games?dur(tot.t):'–'}</b><span>de jeu</span></div><div><b>${M.games?nf(M.reviews.length):'–'}</b><span>avis donnés</span></div></div>
@@ -1151,8 +1164,8 @@ async function exportData(){
  const p=S.profile||{};
  const data={exporte_le:new Date().toISOString(),source:'iiGameStudio (iigamestudio.vercel.app)',
   compte:{email:S.session.user.email,pseudo:p.display_name,avatar:p.avatar,role:p.role,inscrit_le:p.created_at},
-  avis:rv.data||[],parties_par_jeu:Object.values(M.games||{}),evenements:ev.data||[],
-  sur_cet_appareil:"La progression dans les jeux est enregistrée dans ton navigateur, pas sur nos serveurs."};
+  avis:rv.data||[],sauvegardes:Object.values(M.saves||{}),parties_par_jeu:Object.values(M.games||{}),evenements:ev.data||[],
+  sur_cet_appareil:"Les jeux gardent aussi une copie de ta progression dans ton navigateur."};
  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
  const fname='iigamestudio-mes-donnees.json';
  try{const f=new File([blob],fname,{type:'application/json'});if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],title:'Mes données iiGameStudio'});drawAccount();return}}catch(e){if(e&&e.name==='AbortError'){drawAccount();return}}
