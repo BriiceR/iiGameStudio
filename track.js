@@ -62,7 +62,9 @@
 
   // Installation : premier lancement de l'appli installée (store ou jeu).
   var instKey = 'iig-installed-' + (game || 'store');
-  if (standalone && !ls(instKey)) { ls(instKey, '1'); send('install', {}); }
+  // Un jeu ouvert depuis l'appli du store n'est pas une installation du jeu.
+  var inStore = game && (/[?&]store=1/.test(location.search) || ss('iig-store') === '1');
+  if (standalone && !inStore && !ls(instKey)) { ls(instKey, '1'); send('install', {}); }
 
   // Temps de jeu : seulement pour les jeux, en comptant le temps où la page est visible.
   if (game) {
