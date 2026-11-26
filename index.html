@@ -608,6 +608,18 @@ body:not(.is-admin) .adm-only{display:none!important}
 .by{font-size:13px;color:var(--muted);margin:-2px 0 8px}
 .by b{color:var(--vtext);font-weight:600}
 .card .by{display:block;margin:2px 0 4px;font-size:12px}
+/* bandeau léger « nouvelle version », en fondu au-dessus de la barre d'onglets */
+.upd{position:fixed;z-index:60;left:50%;bottom:calc(var(--tab) + var(--safe-b) + 10px);transform:translate(-50%,8px);opacity:0;width:max-content;max-width:calc(100% - 24px);display:flex;align-items:center;gap:10px;padding:6px 6px 6px 14px;border-radius:999px;background:color-mix(in srgb,var(--raised) 82%,transparent);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);box-shadow:0 6px 24px rgba(0,0,0,.35),inset 0 0 0 1px var(--line);font-size:13px;color:var(--ink);transition:opacity .35s ease,transform .35s ease;pointer-events:none}
+.upd.on{opacity:1;transform:translate(-50%,0);pointer-events:auto}
+.upd[hidden]{display:none}
+.upd-dot{width:8px;height:8px;border-radius:50%;background:var(--c2,#C6F24E);flex:none;box-shadow:0 0 0 3px color-mix(in srgb,var(--c2,#C6F24E) 25%,transparent)}
+.upd-tx{white-space:nowrap}
+.upd-go{font-family:var(--px);font-size:12px;min-height:36px;padding:0 14px;border-radius:999px;border:0;background:var(--violet);color:#fff;cursor:pointer}
+.upd-go[disabled]{opacity:.7}
+.upd-x{width:32px;height:32px;display:grid;place-items:center;border:0;background:none;color:var(--muted);border-radius:50%;cursor:pointer;padding:0}
+.upd-x svg{width:11px;height:11px}
+@media (min-width:960px){.upd{bottom:24px}}
+@media (prefers-reduced-motion:reduce){.upd{transition:none}}
 </style>
 </head>
 <body>
@@ -747,6 +759,11 @@ body:not(.is-admin) .adm-only{display:none!important}
 <span>Les jeux du studio qui n'existe pas.</span>
 </div></footer>
 
+<div class="upd" id="upd" role="status" aria-live="polite" hidden>
+<span class="upd-dot" aria-hidden="true"></span><span class="upd-tx">Nouvelle version disponible</span>
+<button type="button" class="upd-go" id="upd-go">ACTUALISER</button>
+<button type="button" class="upd-x" id="upd-x" aria-label="Plus tard"><svg viewBox="0 0 8 8" aria-hidden="true"><path fill="currentColor" d="M1 1h1v1h-1zM2 2h1v1h-1zM3 3h2v2h-2zM5 2h1v1h-1zM6 1h1v1h-1zM2 5h1v1h-1zM1 6h1v1h-1zM5 5h1v1h-1zM6 6h1v1h-1z"/></svg></button>
+</div>
 <nav class="tabbar" aria-label="Onglets">
 <a href="#accueil" data-tab="accueil"><svg class="pi" viewBox="0 0 8 8" aria-hidden="true"><use href="#i-home"/></svg>Accueil</a>
 <a href="#jeux" data-tab="jeux"><svg class="pi" viewBox="0 0 8 8" aria-hidden="true"><use href="#i-grid"/></svg>Jeux</a>
@@ -1418,7 +1435,22 @@ function show(){
 addEventListener('hashchange',show);show();
 addEventListener('keydown',e=>{if(e.key==='Escape'&&$('#launch').classList.contains('on'))history.back()});
 addEventListener('pageshow',e=>{if(e.persisted)show()});
-if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('/sw.js',{scope:'/'}).catch(()=>{}));
+// mise à jour de l'appli : le service worker s'installe dès qu'une nouvelle version est en ligne ;
+// le bouton Actualiser recharge la page pour l'appliquer (pastille verte quand elle est arrivée)
+let swReg=null;
+const hadSW=!!(navigator.serviceWorker&&navigator.serviceWorker.controller);
+function markUpdate(){const u=document.getElementById('upd');if(!u||u.dataset.off)return;u.hidden=false;requestAnimationFrame(()=>requestAnimationFrame(()=>u.classList.add('on')))}
+if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('/sw.js',{scope:'/'}).then(reg=>{
+ swReg=reg;
+ reg.addEventListener('updatefound',()=>{const w=reg.installing;if(w)w.addEventListener('statechange',()=>{if(w.state==='activated'&&hadSW)markUpdate()})});
+ document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')reg.update().catch(()=>{})});
+}).catch(()=>{}));
+document.getElementById('upd-go')?.addEventListener('click',async e=>{
+ const b=e.currentTarget;b.disabled=true;b.textContent='…';
+ try{if(swReg)await Promise.race([swReg.update(),new Promise(r=>setTimeout(r,4000))])}catch(_){}
+ location.reload();
+});
+document.getElementById('upd-x')?.addEventListener('click',()=>{const u=document.getElementById('upd');u.dataset.off='1';u.classList.remove('on');setTimeout(()=>{u.hidden=true},400)});
 }
 </script>
 <script src="/track.js" defer></script>
