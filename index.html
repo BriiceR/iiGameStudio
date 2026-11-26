@@ -1183,7 +1183,7 @@ function avaSvg(id,size){
 /* progression lue dans la sauvegarde en ligne de chaque jeu */
 const PROG={
  slime:d=>[['Meilleure hauteur',LBF.slime.fmt(d.best||0)],['Pièces',nf(d.coins||0)]],
- ntd:d=>{const n=d&&d.M&&d.M.niv||{};const sous=Object.values(n).reduce((a,v)=>a+Math.min(10,Number(v&&v.sous)||0),0);return[['Niveaux finis',sous+' / 50'],['Record',nf(d.record||0)+' or']]}
+ ntd:d=>{const n=d&&d.M&&d.M.niv||{};const sous=Object.values(n).reduce((a,v)=>a+Math.min(10,Number(v&&v.sous)||0),0);const r=ntdRang(d.M&&d.M.xp);return[['Rang',r.niv+' · '+r.titre],['Niveaux finis',sous+' / 50']]}
 };
 const M={ranks:{},saves:{},games:null,reviews:[],err:false,edit:false,ava:null,busy:false,msg:null,del:false,delBusy:false,delErr:null,expBusy:false};
 
@@ -1300,7 +1300,10 @@ document.addEventListener('click',e=>{
 document.addEventListener('submit',e=>{if(e.target.id==='prof-f'){e.preventDefault();saveProfile()}});
 
 // ---- Classements (calculés depuis la sauvegarde en ligne)
-const LBF={ntd:{what:"Record d'or en une seule descente",fmt:v=>nf(v)+' or'},slime:{what:'Meilleure hauteur atteinte',fmt:v=>Number(v).toLocaleString('fr-FR',{minimumFractionDigits:1,maximumFractionDigits:1})+' m'}};
+/* NTD : même calcul de rang que le jeu (200 XP × rang pour passer au suivant) */
+const NTD_TITRES=['Vagabond','Écuyer','Éclaireur','Aventurier','Chevalier','Champion','Héros','Seigneur','Légende'];
+function ntdRang(xp){let n=1,r=Math.max(0,Math.floor(Number(xp)||0));while(r>=200*n){r-=200*n;n++}return{niv:n,titre:n<=NTD_TITRES.length?NTD_TITRES[n-1]:'Légende '+(n-NTD_TITRES.length+1)}}
+const LBF={ntd:{what:"Rang du joueur, selon son expérience totale",fmt:v=>{const r=ntdRang(v);return 'Rang '+r.niv+' · '+r.titre}},slime:{what:'Meilleure hauteur atteinte',fmt:v=>Number(v).toLocaleString('fr-FR',{minimumFractionDigits:1,maximumFractionDigits:1})+' m'}};
 const ord=n=>n===1?'1<sup>er</sup>':n+'<sup>e</sup>';
 const LB={};
 async function myRank(db){
