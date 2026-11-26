@@ -3,6 +3,7 @@
    API (window.iigCloud) :
      await iigCloud.user()        -> {id, email} ou null (renouvelle la connexion si besoin)
      const d = iigCloud.doc('ntd') -> await d.get() : {exists, data()}  ·  await d.set(objet)
+     await iigCloud.profile()     -> {display_name, role, avatar} ou null
      await iigCloud.login()       -> ouvre une fenêtre de connexion (e-mail + code), true si connecté
    La connexion est la même que celle du store (même stockage du navigateur). */
 (function () {
@@ -50,6 +51,17 @@
   async function user() {
     var s = await session();
     return s ? { id: s.user.id, email: s.user.email } : null;
+  }
+
+  var prof = null;
+  async function profile() {
+    var s = await session(); if (!s) return null;
+    if (prof && prof.id === s.user.id) return prof;
+    try {
+      var r = await fetch(API + '/rest/v1/profiles?select=id,display_name,role,avatar&id=eq.' + s.user.id, { headers: headers(s.access_token) });
+      if (!r.ok) return null;
+      prof = (await r.json())[0] || null; return prof;
+    } catch (e) { return null; }
   }
 
   function doc(game) {
@@ -145,5 +157,5 @@
     });
   }
 
-  window.iigCloud = { user: user, doc: doc, login: login, session: session };
+  window.iigCloud = { user: user, profile: profile, doc: doc, login: login, session: session };
 })();

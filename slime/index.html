@@ -58,6 +58,7 @@
          border: 3px solid #111; background: #ffd43b; color: #111; box-shadow: 0 4px 0 rgba(0,0,0,.35); touch-action: manipulation; }
   .buy:disabled { background: #d5d9de; color: #666; box-shadow: none; }
 </style>
+<script src="/cloud.js"></script>
 </head>
 <body>
 <div id="wrap">
@@ -125,14 +126,14 @@
   // ---------- état ----------
   var state = "menu", plats, coins, p, camY, startY, best = 0, height = 0, coinCount = 0, time = 0, pops, enemies, arrows;
   // Sauvegarde : pièces, record et achats sont gardés d'une partie à l'autre.
-  var S = { coins: 0, best: 0, jump: 0, speed: 0, hearts: 0, rockets: 0, double: 0, armor: 0 };
+  var S = { coins: 0, best: 0, jump: 0, speed: 0, hearts: 0, rockets: 0, double: 0, armor: 0, maj: 0 };
   try {
     var raw = JSON.parse(localStorage.getItem("plushaut_save") || "null");
     if (raw) { for (var kk in S) { if (typeof raw[kk] === "number" && isFinite(raw[kk])) S[kk] = raw[kk]; } }
     else { S.best = parseFloat(localStorage.getItem("plushaut_record")) || 0; }
   } catch (e) {}
   best = S.best;
-  function save() { S.best = best; try { localStorage.setItem("plushaut_save", JSON.stringify(S)); } catch (e) {} }
+  function save() { S.best = best; S.maj = Date.now(); try { localStorage.setItem("plushaut_save", JSON.stringify(S)); } catch (e) {} cloudPush(); }
   window.addEventListener("pagehide", save);
 
   function rnd(a, b) { return a + Math.random() * (b - a); }
@@ -184,7 +185,7 @@
   function $(id) { return document.getElementById(id); }
   var panel = $("panel"), ptitle = $("ptitle"), pbody = $("pbody"), goBtn = $("go"), shop = $("shop"), bk = $("bk");
 
-  function stats() { return '<p>Meilleur score : <b>' + best.toFixed(1) + ' m</b></p><p>Pièces : <b>' + S.coins + '</b></p>'; }
+  function stats() { return '<p>Meilleur score : <b>' + best.toFixed(1) + ' m</b></p><p>Pièces : <b>' + S.coins + '</b></p>' + cloudLine(); }
   function updateButtons() { bk.classList.toggle("show", state === "play" && S.rockets > 0); $("bkn").textContent = S.rockets; }
   function start() { reset(); state = "play"; panel.classList.add("hide"); shop.classList.add("hide"); updateButtons(); }
   goBtn.addEventListener("click", start);
@@ -193,6 +194,7 @@
     state = "over";
     var rec = height > best;
     if (rec) best = height;
+    if (cloudWaiting) { var cw = cloudWaiting; cloudWaiting = null; if (cw.best > best) best = cw.best; S.coins = Math.max(S.coins, cw.coins || 0); }
     save(); updateButtons();
     ptitle.textContent = rec ? "Nouveau record !" : "Perdu !";
     pbody.innerHTML = '<p>Hauteur atteinte</p><div class="big">' + height.toFixed(1) + ' m</div>' +
@@ -273,6 +275,57 @@
   });
   var intro = "<p>Grimpe le plus haut possible et ramasse les pièces.</p><p>◀ ▶ pour bouger, SAUT pour sauter.</p><p>Saute sur les monstres pour les écraser.</p>";
   pbody.innerHTML = intro + stats();
+
+  // ---------- sauvegarde en ligne (compte iiGameStudio, voir /cloud.js) ----------
+  // La copie la plus récente gagne : celle du compte si elle date d'après la dernière sauvegarde de cet appareil.
+  var cloudDoc = null, cloudState = "attente", cloudT = 0, cloudBusy = false, cloudAgain = false, cloudWaiting = null, majStart = S.maj;
+  function cloudLine() {
+    var st = 'style="margin-top:10px;font-size:13px;opacity:.85"';
+    if (cloudState === "ok") return '<div class="sv" ' + st + '>☁ Sauvegarde en ligne active</div>';
+    if (cloudState === "deco") return '<div class="sv" ' + st + '><button type="button" id="cloudCo" style="font:inherit;font-weight:700;color:inherit;background:none;border:0;padding:6px 0;text-decoration:underline;cursor:pointer">Se connecter</button> pour garder ta progression sur tous tes appareils</div>';
+    return "";
+  }
+  function refreshMenu() { if (state === "menu") pbody.innerHTML = intro + stats(); else { var sv = pbody.querySelector(".sv"); if (sv) sv.outerHTML = cloudLine(); } }
+  function cloudPush() {
+    if (!cloudDoc) return;
+    clearTimeout(cloudT); cloudT = setTimeout(function () {
+      if (cloudBusy) { cloudAgain = true; return; }
+      cloudBusy = true;
+      cloudDoc.set(JSON.parse(JSON.stringify(S))).then(function () { cloudState = "ok"; }, function () { cloudState = "erreur"; }).then(function () {
+        cloudBusy = false; if (cloudAgain) { cloudAgain = false; cloudPush(); }
+      });
+    }, 1500);
+  }
+  function adopt(d) {
+    for (var k in S) { if (typeof d[k] === "number" && isFinite(d[k])) S[k] = d[k]; }
+    best = S.best;
+    try { localStorage.setItem("plushaut_save", JSON.stringify(S)); } catch (e) {}
+    refreshMenu();
+  }
+  function cloudConnect() {
+    var C = window.iigCloud;
+    if (!C) { cloudState = "erreur"; return; }
+    C.user().then(function (u) {
+      if (!u) { cloudState = "deco"; refreshMenu(); return null; }
+      var doc = C.doc("slime");
+      return doc.get().then(function (snap) {
+        var d = snap.exists ? snap.data() : null;
+        if (d && typeof d.maj === "number" && d.maj > majStart) {
+          cloudDoc = doc; cloudState = "ok";
+          if (state === "play") cloudWaiting = d; else adopt(d);
+        } else {
+          cloudDoc = doc; cloudState = "ok";
+          if (S.best > 0 || S.coins > 0) cloudPush();
+        }
+        refreshMenu();
+      });
+    }).catch(function () { cloudState = "erreur"; refreshMenu(); });
+  }
+  document.addEventListener("click", function (e) {
+    if (!e.target.closest || !e.target.closest("#cloudCo") || !window.iigCloud) return;
+    window.iigCloud.login().then(function (ok) { if (ok) { cloudState = "attente"; refreshMenu(); cloudConnect(); } });
+  });
+  cloudConnect();
 
   // ---------- logique ----------
   function update(dt) {
