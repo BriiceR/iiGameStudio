@@ -656,6 +656,27 @@ body:not(.is-admin) .adm-only{display:none!important}
 .tgl[aria-checked=true]{background:var(--violet)}
 .tgl[aria-checked=true] i{transform:translateX(20px)}
 .tgl[disabled]{opacity:.6}
+/* proposition d'activer le rappel du soir */
+.ask{position:fixed;inset:0;z-index:70;display:flex;align-items:flex-end;justify-content:center;padding:12px;padding-bottom:calc(var(--tab) + var(--safe-b) + 12px)}
+.ask[hidden]{display:none}
+.ask-bg{position:absolute;inset:0;background:rgba(10,4,16,.55);opacity:0;transition:opacity .3s}
+.ask.on .ask-bg{opacity:1}
+.ask-box{position:relative;width:100%;max-width:400px;background:var(--raised);border:1px solid var(--line);border-radius:18px;padding:20px;display:grid;gap:10px;justify-items:center;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.45);transform:translateY(24px);opacity:0;transition:transform .35s ease,opacity .35s ease}
+.ask.on .ask-box{transform:none;opacity:1}
+.ask-ico{width:44px;height:44px;image-rendering:pixelated}
+.ask-box h2{font-size:18px;line-height:1.2}
+.ask-box p{font-size:14px;color:var(--muted);line-height:1.45;max-width:320px}
+.ask-acts{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%;margin-top:6px}
+.ask-acts .btn{min-height:48px;font-size:13px}
+@media (min-width:960px){.ask{align-items:center;padding-bottom:12px}}
+@media (prefers-reduced-motion:reduce){.ask-bg,.ask-box{transition:none}}
+.ntopic{gap:12px}
+.nico2{flex:0 0 32px;width:32px;height:32px;border-radius:8px;overflow:hidden;display:grid;place-items:center;background:var(--stage)}
+.nico2 img{width:32px;height:32px;display:block}
+.nico2 svg{width:18px;height:18px;color:var(--coin)}
+.ntopic .ntx{flex:1}
+.acc-list .noff{color:#FF5C7A}
+:root[data-theme=light] .acc-list .noff{color:#C2183D}
 </style>
 </head>
 <body>
@@ -804,6 +825,15 @@ body:not(.is-admin) .adm-only{display:none!important}
 <a class="foot-ver" href="#nouveautes-store" id="foot-ver"></a>
 </div></footer>
 
+<div class="ask" id="ask" hidden>
+<div class="ask-bg" data-ask="later"></div>
+<section class="ask-box" role="dialog" aria-modal="true" aria-labelledby="ask-t">
+<svg class="ask-ico" viewBox="0 0 8 8" aria-hidden="true"><path fill="#FFD447" d="M3 0h3v1h-3zM2 1h2v1h-2zM1 2h2v4h-2zM2 6h2v1h-2zM3 7h3v1h-3zM6 6h1v1h-1z"/><path fill="#C6F24E" d="M6 2h1v1h-1zM5 4h1v1h-1z"/></svg>
+<h2 id="ask-t" class="px">Active les notifications ?</h2>
+<p id="ask-p">Rappel du soir, nouveautés et événements des jeux. Tu choisis ce que tu reçois dans ton Compte.</p>
+<div class="ask-acts"><button type="button" class="btn ghost" data-ask="later">Plus tard</button><button type="button" class="btn" data-ask="yes" id="ask-yes">ACTIVER</button></div>
+</section>
+</div>
 <div class="upd" id="upd" role="status" aria-live="polite" hidden>
 <span class="upd-dot" aria-hidden="true"></span><span class="upd-tx">Nouvelle version disponible</span>
 <button type="button" class="upd-go" id="upd-go">ACTUALISER</button>
@@ -1092,7 +1122,7 @@ document.addEventListener('click',async e=>{
 if(S.sb){
  S.sb.auth.onAuthStateChange((ev,session)=>{
   S.session=session;
-  setTimeout(async()=>{await loadProfile();S.authReady=true;if(uid())loadMine();else Object.assign(M,{games:null,reviews:[],edit:false,ava:null,del:false});drawAccount();if((location.hash||'').startsWith('#admin'))openAdmin();{const jh=(location.hash||'').slice(1);if(jh.startsWith('jeu-')&&GAMES[jh.slice(4)])loadBoard(jh.slice(4))}drawAllReviews();Object.keys(GAMES).forEach(k=>{if(S.loaded[k])loadReviews(k)});
+  setTimeout(async()=>{await loadProfile();S.authReady=true;if(uid())setTimeout(maybeAsk,ev==='SIGNED_IN'?1200:2500);if(uid())loadMine();else Object.assign(M,{games:null,reviews:[],edit:false,ava:null,del:false});drawAccount();if((location.hash||'').startsWith('#admin'))openAdmin();{const jh=(location.hash||'').slice(1);if(jh.startsWith('jeu-')&&GAMES[jh.slice(4)])loadBoard(jh.slice(4))}drawAllReviews();Object.keys(GAMES).forEach(k=>{if(S.loaded[k])loadReviews(k)});
    if(ev==='SIGNED_IN'){S.login={step:'email',email:'',busy:false,msg:null};let fromLink=false;try{fromLink=sessionStorage.getItem('iig-login')==='1';sessionStorage.removeItem('iig-login')}catch(_){}if(fromLink&&location.hash!=='#compte')location.hash='#compte'}
    const nc=$('#nav-compte');if(nc)nc.textContent=uid()?(S.profile?.display_name||'Compte').slice(0,16):'COMPTE';
    syncHead();syncJoin();
@@ -1503,9 +1533,15 @@ function syncBack(view){
  a.setAttribute('href',href);a.innerHTML=pi('back')+esc(label);
 }
 
-// ---- Notifications : rappel du soir (membres)
+// ---- Notifications : une seule autorisation, puis des sujets (tous actifs par défaut, le joueur décoche)
 const VAPID_PUB='BDt4po2nYF-r5DnW20gsV95y7cGc_wraXrMWJ60Wsl0fOU1FBWg18dCGiFD9SNAXprto9HfKMjkYJTgkvRifoDI';
-const N={state:'?',busy:false,msg:null};
+const TOPICS=[
+ {k:'store:rappel',label:'Rappel du soir',sub:'Chaque soir à 20 h',ico:'moon'},
+ {k:'store:maj',label:'Nouveautés',sub:'Mises à jour du store et des jeux',ico:'star'},
+ {k:'ntd:evenements',label:'Nine Tiles Dungeon',sub:'Défis, chapitres et événements',img:'icon-ntd'},
+ {k:'slime:evenements',label:'Slime Vertical',sub:'Événements du jeu',img:'icon-vertical'}
+];
+const N={state:'?',busy:false,msg:null,sid:null,topics:new Set(),tbusy:{}};
 const pushOK=()=>'serviceWorker' in navigator&&'PushManager' in window&&'Notification' in window;
 const isIOS=/iPhone|iPad|iPod/.test(navigator.userAgent)||(/Macintosh/.test(navigator.userAgent)&&navigator.maxTouchPoints>1);
 function b64u(s){const p='='.repeat((4-s.length%4)%4),b=atob((s+p).replace(/-/g,'+').replace(/_/g,'/'));return Uint8Array.from(b,c=>c.charCodeAt(0))}
@@ -1514,8 +1550,9 @@ async function pushState(){
  if(Notification.permission==='denied'){N.state='denied';return}
  try{const reg=await navigator.serviceWorker.ready;const sub=await reg.pushManager.getSubscription();
   if(!sub||!uid()){N.state='off';return}
-  const {data}=await S.sb.from('push_subscriptions').select('id,subscription_topics(topic)').eq('endpoint',sub.endpoint).maybeSingle();
-  N.state=data&&(data.subscription_topics||[]).some(t=>t.topic==='rappel')?'on':'off';
+  const {data}=await S.sb.from('push_subscriptions').select('id,subscription_topics(scope,topic)').eq('endpoint',sub.endpoint).maybeSingle();
+  if(!data){N.state='off';return}
+  N.sid=data.id;N.topics=new Set((data.subscription_topics||[]).map(t=>t.scope+':'+t.topic));N.state='on';
  }catch(e){N.state='off'}
 }
 async function pushOn(){
@@ -1529,9 +1566,10 @@ async function pushOn(){
   const j=sub.toJSON();
   const {data,error}=await S.sb.from('push_subscriptions').upsert({endpoint:j.endpoint,p256dh:j.keys.p256dh,auth:j.keys.auth,user_id:uid(),last_seen:new Date().toISOString()},{onConflict:'endpoint'}).select('id').single();
   if(error)throw error;
-  const t=await S.sb.from('subscription_topics').upsert({subscription_id:data.id,scope:'store',topic:'rappel'},{onConflict:'subscription_id,scope,topic',ignoreDuplicates:true});
+  // tous les sujets activés par défaut
+  const t=await S.sb.from('subscription_topics').upsert(TOPICS.map(x=>({subscription_id:data.id,scope:x.k.split(':')[0],topic:x.k.split(':')[1]})),{onConflict:'subscription_id,scope,topic',ignoreDuplicates:true});
   if(t.error)throw t.error;
-  N.state='on';N.msg={t:'C\'est noté : rendez-vous à 20 h !'};
+  N.sid=data.id;N.topics=new Set(TOPICS.map(x=>x.k));N.state='on';N.msg={t:'Notifications activées. Choisis ci-dessous ce que tu veux recevoir.'};
  }catch(e){if(e)N.msg={t:'Activation impossible pour l\'instant, réessaie.',err:true}}
  N.busy=false;drawAccount();
 }
@@ -1539,16 +1577,60 @@ async function pushOff(){
  N.busy=true;N.msg=null;drawAccount();
  try{const reg=await navigator.serviceWorker.ready;const sub=await reg.pushManager.getSubscription();
   if(sub){await S.sb.from('push_subscriptions').delete().eq('endpoint',sub.endpoint);await sub.unsubscribe().catch(()=>{})}
-  N.state='off';N.msg={t:'Rappel désactivé.'};
+  N.state='off';N.sid=null;N.topics=new Set();N.msg={t:'Notifications coupées sur ce téléphone.'};
  }catch(e){N.msg={t:'La désactivation n\'a pas marché, réessaie.',err:true}}
  N.busy=false;drawAccount();
 }
-function drawNotif(){
- const sub=N.state==='on'?'Activé · une notification chaque soir à 20 h':N.state==='ios-web'?'Sur iPhone : installe l\'appli (onglet Installer), puis active-le ici.':N.state==='denied'?'Bloqué dans les réglages du téléphone pour ce site.':N.state==='na'?'Ce navigateur ne gère pas les notifications.':'« Viens jouer ! » chaque soir à 20 h';
- const can=N.state==='on'||N.state==='off';
- const test=N.state==='on'?`<button type="button" data-acc="push-test"${N.busy?' disabled':''}>Tester une notification sur ce téléphone<span class="chev" aria-hidden="true">›</span></button>`:'';
- return `<div class="acc-list"><div class="k nrow"><span class="ntx"><span>Rappel du soir · 20 h</span><small>${sub}</small></span>${can?`<button type="button" class="tgl" role="switch" aria-checked="${N.state==='on'}" aria-label="Rappel du soir" data-acc="push"${N.busy?' disabled':''}><i></i></button>`:''}</div>${test}</div>${N.msg?`<p class="rv-msg${N.msg.err?' err':''}" role="status" style="margin:-4px 0 12px">${esc(N.msg.t)}</p>`:''}`;
+async function topicToggle(k){
+ if(!N.sid||N.tbusy[k])return;
+ const [scope,topic]=k.split(':'),on=N.topics.has(k);
+ N.tbusy[k]=true;on?N.topics.delete(k):N.topics.add(k);drawAccount();
+ const r=on?await S.sb.from('subscription_topics').delete().eq('subscription_id',N.sid).eq('scope',scope).eq('topic',topic)
+  :await S.sb.from('subscription_topics').upsert({subscription_id:N.sid,scope,topic},{onConflict:'subscription_id,scope,topic',ignoreDuplicates:true});
+ N.tbusy[k]=false;if(r.error){on?N.topics.add(k):N.topics.delete(k);N.msg={t:'Le changement n\'a pas marché, réessaie.',err:true}}
+ drawAccount();
 }
+const MOON='<svg viewBox="0 0 8 8" aria-hidden="true"><path fill="#FFD447" d="M3 0h3v1h-3zM2 1h2v1h-2zM1 2h2v4h-2zM2 6h2v1h-2zM3 7h3v1h-3zM6 6h1v1h-1z"/></svg>';
+function topicIco(t){return t.img?`<img src="${IMG[t.img]}" alt="">`:t.ico==='moon'?MOON:pi('star')}
+function drawNotif(){
+ const msg=N.msg?`<p class="rv-msg${N.msg.err?' err':''}" role="status" style="margin:-4px 0 12px">${esc(N.msg.t)}</p>`:'';
+ if(N.state!=='on'){
+  const sub=N.state==='ios-web'?'Sur iPhone : installe l\'appli (onglet Installer), puis active-les ici.':N.state==='denied'?'Bloquées dans les réglages du téléphone pour ce site.':N.state==='na'?'Ce navigateur ne gère pas les notifications.':'Rappel du soir, nouveautés, événements des jeux.';
+  const can=N.state==='off';
+  return `<div class="acc-list"><div class="k nrow"><span class="ntx"><span>Notifications</span><small>${sub}</small></span>${can?`<button type="button" class="btn sm" data-acc="push"${N.busy?' disabled':''}>${N.busy?'…':'ACTIVER'}</button>`:''}</div></div>${msg}`;
+ }
+ const rows=TOPICS.map(t=>`<div class="k nrow ntopic"><span class="nico2">${topicIco(t)}</span><span class="ntx"><span>${t.label}</span><small>${t.sub}</small></span><button type="button" class="tgl" role="switch" aria-checked="${N.topics.has(t.k)}" aria-label="${esc(t.label)}" data-topic="${t.k}"${N.tbusy[t.k]?' disabled':''}><i></i></button></div>`).join('');
+ return `<div class="acc-list">${rows}<button type="button" data-acc="push-test"${N.busy?' disabled':''}>Tester une notification sur ce téléphone<span class="chev" aria-hidden="true">›</span></button><button type="button" data-acc="push" class="noff"${N.busy?' disabled':''}>Couper toutes les notifications sur ce téléphone</button></div>${msg}`;
+}
+document.addEventListener('click',e=>{const t=e.target.closest('[data-topic]');if(t)topicToggle(t.dataset.topic)});
+
+// ---- Proposition d'activer le rappel (après connexion ou au lancement, une fois tous les 7 jours au plus)
+const ASK_KEY='iig-push-ask';
+function askSnoozed(){try{return Date.now()-Number(localStorage.getItem(ASK_KEY)||0)<7*86400000}catch(e){return false}}
+function showAsk(mode){
+ const a=$('#ask');if(!a||!a.hidden)return;
+ a.dataset.mode=mode;
+ if(mode==='ios'){$('#ask-p').textContent="Sur iPhone, les notifications marchent dans l'appli installée. Installe-la depuis l'onglet Installer, puis active-les dans ton Compte.";$('#ask-yes').textContent='VOIR COMMENT'}
+ else{$('#ask-p').textContent="Rappel du soir, nouveautés et événements des jeux. Tu choisis ce que tu reçois dans ton Compte.";$('#ask-yes').textContent='ACTIVER'}
+ a.hidden=false;requestAnimationFrame(()=>requestAnimationFrame(()=>a.classList.add('on')));setTimeout(()=>$('#ask-yes')?.focus(),350);
+}
+function hideAsk(){const a=$('#ask');if(!a||a.hidden)return;a.classList.remove('on');setTimeout(()=>{a.hidden=true},350)}
+async function maybeAsk(){
+ if(!uid()||askSnoozed())return;
+ const h=(location.hash||'').slice(1);if(h.startsWith('lancement-')||h.startsWith('admin'))return;
+ await pushState();
+ if(N.state==='off'&&Notification.permission!=='denied')showAsk('push');
+ else if(N.state==='ios-web')showAsk('ios');
+}
+document.addEventListener('click',e=>{
+ const b=e.target.closest('[data-ask]');if(!b)return;
+ const mode=$('#ask').dataset.mode;
+ try{localStorage.setItem(ASK_KEY,String(Date.now()))}catch(x){}
+ hideAsk();
+ if(b.dataset.ask==='yes'){if(mode==='ios')location.hash='#installer-store';else pushOn().then(()=>{if(N.state==='on'){N.msg=null;toast("Notifications activées : à ce soir, 20 h !")}})}
+});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('#ask').hidden){try{localStorage.setItem(ASK_KEY,String(Date.now()))}catch(x){}hideAsk()}});
+function toast(t){const u=$('#upd');if(!u)return;const tx=u.querySelector('.upd-tx'),go=$('#upd-go'),old=tx.textContent;tx.textContent=t;go.hidden=true;u.hidden=false;requestAnimationFrame(()=>u.classList.add('on'));setTimeout(()=>{u.classList.remove('on');setTimeout(()=>{u.hidden=true;tx.textContent=old;go.hidden=false},400)},3500)}
 
 // navigation
 let timer=null,prev='';

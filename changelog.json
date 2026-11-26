@@ -1,4 +1,5 @@
 [
+  {"app": "store", "v": 21, "date": "2026-11-26T20:55", "notes": ["Notifications : une seule autorisation, puis tu choisis tes sujets dans ton Compte (rappel du soir, nouveautés, événements de chaque jeu).", "Proposition d'activer les notifications après la connexion."]},
   {"app": "store", "v": 20, "date": "2026-11-26T20:40", "notes": ["Notifications : nouveau moteur d'envoi et bouton pour tester une notification sur ton téléphone."]},
   {"app": "store", "v": 19, "date": "2026-11-26T20:10", "notes": ["Rappel du soir : active-le dans ton Compte pour recevoir « Viens jouer ! » chaque soir à 20 h (sur iPhone, dans l'appli installée)."]},
   {"app": "store", "v": 18, "date": "2026-11-26T20:05", "notes": ["Coulisses : des garde-fous pour garder des classements honnêtes."]},
