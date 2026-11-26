@@ -564,6 +564,27 @@ body:not(.is-admin) .adm-only{display:none!important}
 .lb-lock .cta b{font-family:var(--px);font-weight:400;font-size:16px}
 .lb-lock .cta p{font-size:13px;color:var(--muted);max-width:300px}
 .lb-lock .cta .pi{width:28px;height:28px;color:var(--vtext)}
+/* ===== Bouton compte de l'en-tête et bandeau d'inscription ===== */
+.head-acc span{white-space:nowrap}
+.head-acc.in span{max-width:10ch;overflow:hidden;text-overflow:ellipsis}
+.head-acc.in{background:var(--raised);color:var(--ink);box-shadow:inset 0 0 0 2px var(--line);font-family:Rubik,sans-serif;font-size:14px;font-weight:500;letter-spacing:0;text-transform:none;gap:8px}
+.head-acc .ava{margin:-2px 0}
+.join{background:color-mix(in srgb,var(--violet) 22%,var(--bg));border-bottom:1px solid color-mix(in srgb,var(--violet) 45%,var(--bg))}
+.join-in{display:grid;grid-template-columns:auto minmax(0,1fr) auto;grid-template-areas:"av tx x" "go go go";gap:10px 12px;align-items:center;padding-top:12px;padding-bottom:12px}
+.join-av{grid-area:av;display:flex}
+.join-av .ava{width:30px;height:30px;padding:3px;background:var(--stage);border-radius:8px;box-shadow:0 0 0 2px var(--bg)}
+.join-av .ava+.ava{margin-left:-8px}
+.join-tx{grid-area:tx;display:flex;flex-direction:column;font-size:13px;line-height:1.35;color:var(--muted)}
+.join-tx b{font-size:15px;color:var(--ink);font-weight:600}
+.join-go{grid-area:go;width:100%;min-height:44px}
+.join-x{grid-area:x;align-self:start;width:36px;height:36px;margin:-4px -6px 0 0;display:grid;place-items:center;background:none;border:0;border-radius:8px;color:var(--muted);cursor:pointer}
+.join-x svg{width:14px;height:14px}
+.join-x:hover{color:var(--ink)}
+@media (min-width:600px){
+ .join-in{grid-template-columns:auto minmax(0,1fr) auto auto;grid-template-areas:"av tx go x"}
+ .join-go{width:auto}
+ .join-x{align-self:center;margin:0}
+}
 </style>
 </head>
 <body>
@@ -589,9 +610,18 @@ body:not(.is-admin) .adm-only{display:none!important}
 <a href="#studio" data-nav="studio">LE STUDIO</a>
 <a href="#compte" data-nav="compte" id="nav-compte">COMPTE</a>
 <a href="#admin" data-nav="admin" class="adm-only">ADMIN<span class="adm-badge" data-adm-badge hidden></span></a>
+<a href="#installer" data-nav="installer" class="hide-sa">INSTALLER</a>
 </nav>
-<a href="#installer" class="btn sm hide-sa"><svg class="pi" viewBox="0 0 8 8" aria-hidden="true"><use href="#i-dl"/></svg>INSTALLER</a>
+<a href="#compte" class="btn sm head-acc" id="head-acc"><svg class="pi" viewBox="0 0 8 8" aria-hidden="true"><use href="#i-user"/></svg><span>SE CONNECTER</span></a>
 </div></header>
+<aside class="join" id="join" hidden aria-labelledby="join-t">
+<div class="wrap join-in">
+<div class="join-av" aria-hidden="true"></div>
+<p class="join-tx"><b id="join-t">Crée ton compte gratuit</b><span>Classements, progression sauvegardée sur tous tes appareils, profil et avis.</span></p>
+<a class="btn sm join-go" href="#compte">JE M'INSCRIS</a>
+<button class="join-x" type="button" aria-label="Masquer ce message"><svg viewBox="0 0 8 8" aria-hidden="true"><path fill="currentColor" d="M1 1h1v1h-1zM2 2h1v1h-1zM3 3h2v2h-2zM5 2h1v1h-1zM6 1h1v1h-1zM2 5h1v1h-1zM1 6h1v1h-1zM5 5h1v1h-1zM6 6h1v1h-1z"/></svg></button>
+</div>
+</aside>
 
 <main id="main">
 <!-- ACCUEIL -->
@@ -934,6 +964,7 @@ if(S.sb){
   setTimeout(async()=>{await loadProfile();S.authReady=true;if(uid())loadMine();else Object.assign(M,{games:null,reviews:[],edit:false,ava:null,del:false});drawAccount();if((location.hash||'').startsWith('#admin'))openAdmin();{const jh=(location.hash||'').slice(1);if(jh.startsWith('jeu-')&&GAMES[jh.slice(4)])loadBoard(jh.slice(4))}drawAllReviews();Object.keys(GAMES).forEach(k=>{if(S.loaded[k])loadReviews(k)});
    if(ev==='SIGNED_IN'){S.login={step:'email',email:'',busy:false,msg:null};let fromLink=false;try{fromLink=sessionStorage.getItem('iig-login')==='1';sessionStorage.removeItem('iig-login')}catch(_){}if(fromLink&&location.hash!=='#compte')location.hash='#compte'}
    const nc=$('#nav-compte');if(nc)nc.textContent=uid()?(S.profile?.display_name||'Compte').slice(0,16):'COMPTE';
+   syncHead();syncJoin();
   },0);
  });
  loadStats();
@@ -1153,7 +1184,7 @@ function drawMyGames(){
  if(M.games===null)return '<p class="rv-msg">Chargement…</p>';
  return `<div class="mg">${Object.keys(GAMES).map(k=>{const g=GAMES[k],s=M.games[g.db],rv=M.reviews.find(r=>r.game_id===g.db);
   const sub=s&&s.launches?`${nf(s.launches)} partie${s.launches>1?'s':''} · dernière ${ago(s.last_at)}${s.play_s?' · '+dur(s.play_s)+' de jeu':''}`:'Pas encore joué avec ton compte';
-  const note=rv?`<span class="mine">Ta note ${starRow(rv.rating)}</span>`:`<a href="#jeu-${k}">Donner ma note</a>`;
+  const note=rv?`<span class="mine">Ta note ${starRow(rv.rating)}</span>`:`<a href="#avis-${k}">Donner ma note</a>`;
   const sv=M.saves[g.db],pr=sv&&PROG[g.db]?PROG[g.db](sv.data):null;
   const rkk=M.ranks[g.db];
   const cells=(pr?`<dl class="mg-dl">${pr.map(([t,v])=>`<div><dt>${t}</dt><dd>${esc(v)}</dd></div>`).join('')}</dl>`:'')+(rkk?`<a class="mg-rk" href="#classement-${k}">Classement : <b>${ord(rkk.rank)}</b> sur ${rkk.total}<span aria-hidden="true">›</span></a>`:'')+(sv?`<p class="mg-sv">Sauvegardé en ligne ${ago(sv.updated_at)}</p>`:'');
@@ -1187,7 +1218,7 @@ async function saveProfile(){
  M.busy=false;
  if(error){M.msg={t:"L'enregistrement n'a pas marché, réessaie.",err:true};drawAccount();return}
  S.profile={...S.profile,display_name:name,avatar:ava};M.edit=false;M.ava=null;M.msg={t:'Profil enregistré.'};
- const nc=$('#nav-compte');if(nc)nc.textContent=name.slice(0,16);
+ const nc=$('#nav-compte');if(nc)nc.textContent=name.slice(0,16);syncHead();
  drawAccount();Object.keys(GAMES).forEach(k=>{if(S.loaded[k])loadReviews(k)});
 }
 
@@ -1215,7 +1246,7 @@ async function deleteAccount(){
  const {error}=await S.sb.rpc('delete_my_account');
  if(error){M.delBusy=false;M.delErr="La suppression n'a pas marché. Réessaie, ou écris à iigamestudio@gmail.com.";drawAccount();return}
  try{await S.sb.auth.signOut({scope:'local'})}catch(e){}
- S.session=null;S.profile=null;syncAdmin();
+ S.session=null;S.profile=null;syncAdmin();syncHead();syncJoin();
  Object.assign(M,{games:null,reviews:[],edit:false,ava:null,del:false,delBusy:false,msg:null});
  S.login={step:'email',email:'',busy:false,msg:{t:'Ton compte a été supprimé. À bientôt peut-être !'}};
  drawAccount();loadStats();Object.keys(GAMES).forEach(k=>{if(S.loaded[k])loadReviews(k)});
@@ -1276,6 +1307,38 @@ function drawBoard(k){
  el.innerHTML=`<p class="lb-k">${f.what}</p>${b.top.length?`<ol>${rows}${meRow}</ol>`:'<p class="adm-empty">Personne au classement pour l\'instant. Sois le premier !</p>'}<p class="lb-n">${note}</p>`;
 }
 
+// ---- En-tête : bouton compte ; bandeau d'inscription pour les visiteurs
+function syncHead(){
+ const a=$('#head-acc');if(!a)return;
+ if(uid()){const p=S.profile||{};a.classList.add('in');a.innerHTML=`${avaSvg(p.avatar,20)}<span>${esc(p.display_name||'Mon compte')}</span>`;a.setAttribute('aria-label','Mon compte')}
+ else{a.classList.remove('in');a.innerHTML=`${pi('user')}<span>SE CONNECTER</span>`;a.removeAttribute('aria-label')}
+}
+const JOIN_KEY='iig-join-off';
+function joinOff(){try{return Date.now()-Number(localStorage.getItem(JOIN_KEY)||0)<7*86400000}catch(e){return false}}
+function syncJoin(){
+ const j=$('#join');if(!j)return;
+ const h=(location.hash||'#accueil').slice(1);
+ j.hidden=!S.authReady||!!uid()||joinOff()||h==='compte'||h.startsWith('lancement-');
+}
+(function(){const av=$('.join-av');if(av)av.innerHTML=['crane-jaune','slime-lime','chat-violet'].map(a=>avaSvg(a,24)).join('')})();
+document.addEventListener('click',e=>{if(e.target.closest('.join-x')){try{localStorage.setItem(JOIN_KEY,String(Date.now()))}catch(x){}syncJoin()}});
+
+// ---- Retour contextuel : les liens « retour » ramènent à l'écran d'où l'on vient
+const ROUTES=[];
+const viewOf=h=>/^(classement|avis)-/.test(h)?'jeu-'+h.replace(/^(classement|avis)-/,''):h==='jeux'||h==='studio'?'accueil':h.startsWith('installer')?'installer':h.startsWith('admin')?'admin':h;
+const routeLabel=h=>/^(classement|avis)-/.test(h)?routeLabel('jeu-'+h.replace(/^(classement|avis)-/,'')):h==='accueil'?'ACCUEIL':h==='jeux'?'TOUS LES JEUX':h==='studio'?'LE STUDIO':h.startsWith('jeu-')&&GAMES[h.slice(4)]?GAMES[h.slice(4)].name.toUpperCase():h==='compte'?'MON COMPTE':h.startsWith('installer')?'INSTALLER':h.startsWith('admin')?'ADMIN':h==='confidentialite'?'CONFIDENTIALITÉ':'ACCUEIL';
+function pushRoute(h){
+ if(ROUTES.length>=2&&ROUTES[ROUTES.length-2]===h)ROUTES.pop();
+ else if(ROUTES[ROUTES.length-1]!==h){ROUTES.push(h);if(ROUTES.length>30)ROUTES.shift()}
+}
+function syncBack(view){
+ const a=$('#v-'+view+' a.back');if(!a)return;
+ if(!a.dataset.def){a.dataset.def=a.getAttribute('href');a.dataset.defl=a.textContent.trim()}
+ let p=null;for(let i=ROUTES.length-2;i>=0;i--){if(viewOf(ROUTES[i])!==view){p=ROUTES[i];break}}
+ const href=p?'#'+p:a.dataset.def,label=p?routeLabel(p):a.dataset.defl;
+ a.setAttribute('href',href);a.innerHTML=pi('back')+esc(label);
+}
+
 // navigation
 let timer=null,prev='';
 function setTab(t){
@@ -1299,7 +1362,9 @@ function show(){
  let view=h,scroll=null,tab=h;
  if(h==='jeux'){view='accueil';scroll='#jeux-section'}
  if(h==='studio'){view='accueil';scroll='#studio-section'}
- if(h.startsWith('jeu-')){tab='jeux';const gk=h.slice(4);if(GAMES[gk]){loadReviews(gk);loadBoard(gk)}}
+ const sec=/^(classement|avis)-(.+)$/.exec(h);
+ if(sec&&GAMES[sec[2]]){view='jeu-'+sec[2];scroll='#'+h}
+ if(view.startsWith('jeu-')){tab='jeux';const gk=view.slice(4);if(GAMES[gk]){loadReviews(gk);loadBoard(gk)}}
  if(h==='compte'){drawAccount();loadMine()}
  if(h==='admin'||h.startsWith('admin-')){view='admin';tab='admin';openAdmin()}
  if(h.startsWith('installer-')&&TARGETS[h.slice(10)]){target=h.slice(10);view='installer'}
@@ -1307,7 +1372,7 @@ function show(){
  if(view==='installer'){drawInstall();tab='installer'}
  if(!document.getElementById('v-'+view)){view='accueil';tab='accueil'}
  if(view==='accueil'&&!scroll)tab='accueil';
- setTab(tab);
+ setTab(tab);syncJoin();pushRoute(view==='accueil'&&h!=='jeux'&&h!=='studio'?'accueil':h);syncBack(view);
  $$('.view').forEach(v=>v.classList.toggle('on',v.id==='v-'+view));
  if(scroll)requestAnimationFrame(()=>$(scroll).scrollIntoView({behavior:'smooth'}));
  else if(view!==prev)window.scrollTo(0,0);
