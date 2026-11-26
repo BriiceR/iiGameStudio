@@ -151,6 +151,8 @@
         }
       };
       host.addEventListener('click', function (e) { if (e.composedPath()[0] === root.querySelector('.bg')) close(false); });
+      // les touches tapées dans la fenêtre ne doivent pas piloter le jeu en dessous
+      ['keydown', 'keyup', 'keypress'].forEach(function (t) { host.addEventListener(t, function (e) { e.stopPropagation(); }); });
       document.addEventListener('keydown', esc, true);
       document.body.appendChild(host);
       draw();
