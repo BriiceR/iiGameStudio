@@ -1,5 +1,5 @@
 /* Service worker store : le jeu marche hors ligne une fois ouvert. Changer VERSION à chaque mise à jour. */
-const VERSION='store-v19';
+const VERSION='store-v20';
 const SHELL=["/", "/manifest.webmanifest", "/icons/icon-192.png", "/icons/icon-512.png", "/img/logo.svg", "/img/icon-ntd.svg", "/img/icon-slime.svg", "/img/ntd-titre.webp", "/img/ntd-menu.webp", "/img/ntd-carte.webp", "/img/vertical-jeu.webp"];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(VERSION).then(c=>c.addAll(SHELL)).then(()=>self.skipWaiting()))});
 self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k.startsWith('store-')&&k!==VERSION).map(k=>caches.delete(k)))).then(()=>self.clients.claim()))});
@@ -25,7 +25,7 @@ self.addEventListener('fetch',e=>{
 // Notifications (rappel du soir, annonces) : affichage et ouverture du store au toucher
 self.addEventListener('push',e=>{
   let d={};try{d=e.data?e.data.json():{}}catch(_){d={body:e.data&&e.data.text()}}
-  e.waitUntil(self.registration.showNotification(d.title||'iiGameStudio',{body:d.body||'',icon:'/icons/icon-192.png',badge:'/icons/icon-192.png',tag:d.tag||'iig',data:{url:d.url||'/'}}));
+  e.waitUntil(self.registration.showNotification(d.title||'iiGameStudio',{body:d.body||'',icon:'/icons/icon-192.png',badge:'/icons/icon-192.png',tag:d.tag||('iig-'+Date.now()),renotify:!!d.tag,data:{url:d.url||'/'}}));
 });
 self.addEventListener('notificationclick',e=>{
   e.notification.close();

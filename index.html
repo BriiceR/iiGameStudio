@@ -1419,6 +1419,7 @@ document.addEventListener('click',e=>{
  if(a==='cancel'){M.edit=false;M.ava=null;M.msg=null;drawAccount();return}
  if(a==='export'){exportData();return}
  if(a==='push'){N.state==='on'?pushOff():pushOn();return}
+ if(a==='push-test'){(async()=>{try{const reg=await navigator.serviceWorker.ready;const v=reg.active&&reg.active.scriptURL;await reg.showNotification('Test local iiGameStudio 🔔',{body:'Affichée par ton téléphone, sans passer par internet.',icon:'/icons/icon-192.png',tag:'test-local-'+Date.now()});N.msg={t:'Notification de test affichée (sortie de l\'appli, regarde le centre de notifications).'}}catch(e){N.msg={t:'Échec du test : '+(e&&e.message||e),err:true}}drawAccount()})();return}
  if(a==='del'){M.del=true;M.delErr=null;drawAccount();return}
  if(a==='del-no'){M.del=false;drawAccount();return}
  if(a==='del-yes'){deleteAccount();return}
@@ -1545,7 +1546,8 @@ async function pushOff(){
 function drawNotif(){
  const sub=N.state==='on'?'Activé · une notification chaque soir à 20 h':N.state==='ios-web'?'Sur iPhone : installe l\'appli (onglet Installer), puis active-le ici.':N.state==='denied'?'Bloqué dans les réglages du téléphone pour ce site.':N.state==='na'?'Ce navigateur ne gère pas les notifications.':'« Viens jouer ! » chaque soir à 20 h';
  const can=N.state==='on'||N.state==='off';
- return `<div class="acc-list"><div class="k nrow"><span class="ntx"><span>Rappel du soir · 20 h</span><small>${sub}</small></span>${can?`<button type="button" class="tgl" role="switch" aria-checked="${N.state==='on'}" aria-label="Rappel du soir" data-acc="push"${N.busy?' disabled':''}><i></i></button>`:''}</div></div>${N.msg?`<p class="rv-msg${N.msg.err?' err':''}" role="status" style="margin:-4px 0 12px">${esc(N.msg.t)}</p>`:''}`;
+ const test=N.state==='on'?`<button type="button" data-acc="push-test"${N.busy?' disabled':''}>Tester une notification sur ce téléphone<span class="chev" aria-hidden="true">›</span></button>`:'';
+ return `<div class="acc-list"><div class="k nrow"><span class="ntx"><span>Rappel du soir · 20 h</span><small>${sub}</small></span>${can?`<button type="button" class="tgl" role="switch" aria-checked="${N.state==='on'}" aria-label="Rappel du soir" data-acc="push"${N.busy?' disabled':''}><i></i></button>`:''}</div>${test}</div>${N.msg?`<p class="rv-msg${N.msg.err?' err':''}" role="status" style="margin:-4px 0 12px">${esc(N.msg.t)}</p>`:''}`;
 }
 
 // navigation
