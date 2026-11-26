@@ -648,6 +648,14 @@ body:not(.is-admin) .adm-only{display:none!important}
 .pchip.sus{box-shadow:inset 0 0 0 1px var(--coin)}
 .pchip.off{opacity:.75}
 .pchip button{margin-left:auto;min-height:36px;padding:0 10px;font:inherit;font-size:13px;color:var(--vtext);background:none;border:0;cursor:pointer}
+.nrow{flex-direction:row!important;align-items:center!important;justify-content:space-between!important}
+.ntx{display:flex;flex-direction:column;gap:2px;min-width:0}
+.ntx>span{font-size:15px;color:var(--ink)}
+.tgl{flex:none;width:52px;height:32px;border-radius:16px;border:0;background:var(--line);position:relative;cursor:pointer;padding:0}
+.tgl i{position:absolute;top:4px;left:4px;width:24px;height:24px;border-radius:50%;background:#fff;transition:transform .2s}
+.tgl[aria-checked=true]{background:var(--violet)}
+.tgl[aria-checked=true] i{transform:translateX(20px)}
+.tgl[disabled]{opacity:.6}
 </style>
 </head>
 <body>
@@ -1351,6 +1359,7 @@ function drawLoggedIn(el){
  <div class="tiles" aria-label="Mes chiffres"><div><b>${M.games?nf(tot.l):'–'}</b><span>parties</span></div><div><b>${M.games?dur(tot.t):'–'}</b><span>de jeu</span></div><div><b>${M.games?nf(M.reviews.length):'–'}</b><span>avis donnés</span></div></div>
  ${adm}
  <h2 class="acc-h">MES JEUX</h2>${drawMyGames()}
+ <h2 class="acc-h">NOTIFICATIONS</h2>${drawNotif()}
  <h2 class="acc-h">MES DONNÉES</h2>
  <div class="acc-list"><div class="k"><small>Adresse e-mail</small><span>${esc(S.session.user.email)}</span></div>
  <a href="#confidentialite">Ce qu'on garde sur toi<span class="chev" aria-hidden="true">›</span></a>
@@ -1409,6 +1418,7 @@ document.addEventListener('click',e=>{
  if(a==='edit'){M.edit=true;M.ava=S.profile?.avatar||'slime-lime';M.msg=null;drawAccount();$('#prof-name')?.focus();return}
  if(a==='cancel'){M.edit=false;M.ava=null;M.msg=null;drawAccount();return}
  if(a==='export'){exportData();return}
+ if(a==='push'){N.state==='on'?pushOff():pushOn();return}
  if(a==='del'){M.del=true;M.delErr=null;drawAccount();return}
  if(a==='del-no'){M.del=false;drawAccount();return}
  if(a==='del-yes'){deleteAccount();return}
@@ -1492,6 +1502,52 @@ function syncBack(view){
  a.setAttribute('href',href);a.innerHTML=pi('back')+esc(label);
 }
 
+// ---- Notifications : rappel du soir (membres)
+const VAPID_PUB='BDt4po2nYF-r5DnW20gsV95y7cGc_wraXrMWJ60Wsl0fOU1FBWg18dCGiFD9SNAXprto9HfKMjkYJTgkvRifoDI';
+const N={state:'?',busy:false,msg:null};
+const pushOK=()=>'serviceWorker' in navigator&&'PushManager' in window&&'Notification' in window;
+const isIOS=/iPhone|iPad|iPod/.test(navigator.userAgent)||(/Macintosh/.test(navigator.userAgent)&&navigator.maxTouchPoints>1);
+function b64u(s){const p='='.repeat((4-s.length%4)%4),b=atob((s+p).replace(/-/g,'+').replace(/_/g,'/'));return Uint8Array.from(b,c=>c.charCodeAt(0))}
+async function pushState(){
+ if(!pushOK()){N.state=isIOS&&!SA?'ios-web':'na';return}
+ if(Notification.permission==='denied'){N.state='denied';return}
+ try{const reg=await navigator.serviceWorker.ready;const sub=await reg.pushManager.getSubscription();
+  if(!sub||!uid()){N.state='off';return}
+  const {data}=await S.sb.from('push_subscriptions').select('id,subscription_topics(topic)').eq('endpoint',sub.endpoint).maybeSingle();
+  N.state=data&&(data.subscription_topics||[]).some(t=>t.topic==='rappel')?'on':'off';
+ }catch(e){N.state='off'}
+}
+async function pushOn(){
+ N.busy=true;N.msg=null;drawAccount();
+ try{
+  const perm=await Notification.requestPermission();
+  if(perm!=='granted'){N.state=perm==='denied'?'denied':'off';throw 0}
+  const reg=await navigator.serviceWorker.ready;
+  let sub=await reg.pushManager.getSubscription();
+  if(!sub)sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:b64u(VAPID_PUB)});
+  const j=sub.toJSON();
+  const {data,error}=await S.sb.from('push_subscriptions').upsert({endpoint:j.endpoint,p256dh:j.keys.p256dh,auth:j.keys.auth,user_id:uid(),last_seen:new Date().toISOString()},{onConflict:'endpoint'}).select('id').single();
+  if(error)throw error;
+  const t=await S.sb.from('subscription_topics').upsert({subscription_id:data.id,scope:'store',topic:'rappel'},{onConflict:'subscription_id,scope,topic',ignoreDuplicates:true});
+  if(t.error)throw t.error;
+  N.state='on';N.msg={t:'C\'est noté : rendez-vous à 20 h !'};
+ }catch(e){if(e)N.msg={t:'Activation impossible pour l\'instant, réessaie.',err:true}}
+ N.busy=false;drawAccount();
+}
+async function pushOff(){
+ N.busy=true;N.msg=null;drawAccount();
+ try{const reg=await navigator.serviceWorker.ready;const sub=await reg.pushManager.getSubscription();
+  if(sub){await S.sb.from('push_subscriptions').delete().eq('endpoint',sub.endpoint);await sub.unsubscribe().catch(()=>{})}
+  N.state='off';N.msg={t:'Rappel désactivé.'};
+ }catch(e){N.msg={t:'La désactivation n\'a pas marché, réessaie.',err:true}}
+ N.busy=false;drawAccount();
+}
+function drawNotif(){
+ const sub=N.state==='on'?'Activé · une notification chaque soir à 20 h':N.state==='ios-web'?'Sur iPhone : installe l\'appli (onglet Installer), puis active-le ici.':N.state==='denied'?'Bloqué dans les réglages du téléphone pour ce site.':N.state==='na'?'Ce navigateur ne gère pas les notifications.':'« Viens jouer ! » chaque soir à 20 h';
+ const can=N.state==='on'||N.state==='off';
+ return `<div class="acc-list"><div class="k nrow"><span class="ntx"><span>Rappel du soir · 20 h</span><small>${sub}</small></span>${can?`<button type="button" class="tgl" role="switch" aria-checked="${N.state==='on'}" aria-label="Rappel du soir" data-acc="push"${N.busy?' disabled':''}><i></i></button>`:''}</div></div>${N.msg?`<p class="rv-msg${N.msg.err?' err':''}" role="status" style="margin:-4px 0 12px">${esc(N.msg.t)}</p>`:''}`;
+}
+
 // navigation
 let timer=null,prev='';
 function setTab(t){
@@ -1519,7 +1575,7 @@ function show(){
  const sec=/^(classement|avis)-(.+)$/.exec(h);
  if(sec&&GAMES[sec[2]]){view='jeu-'+sec[2];scroll='#'+h}
  if(view.startsWith('jeu-')){tab='jeux';const gk=view.slice(4);if(GAMES[gk]){loadReviews(gk);loadBoard(gk)}}
- if(h==='compte'){drawAccount();loadMine()}
+ if(h==='compte'){drawAccount();loadMine();pushState().then(()=>{if((location.hash||'')==='#compte')drawAccount()})}
  if(h==='admin'||h.startsWith('admin-')){view='admin';tab='admin';openAdmin()}
  if(h.startsWith('installer-')&&TARGETS[h.slice(10)]){target=h.slice(10);view='installer'}
  else if(h==='installer')target='store';
