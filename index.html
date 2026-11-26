@@ -620,6 +620,26 @@ body:not(.is-admin) .adm-only{display:none!important}
 .upd-x svg{width:11px;height:11px}
 @media (min-width:960px){.upd{bottom:24px}}
 @media (prefers-reduced-motion:reduce){.upd{transition:none}}
+/* Nouveautés */
+.nchips{display:flex;gap:8px;flex-wrap:wrap;margin:4px 0 8px}
+.nchip{min-height:40px;display:inline-flex;align-items:center;padding:0 14px;border-radius:20px;font-size:13px;color:var(--ink);text-decoration:none;background:var(--raised);border:1px solid var(--line)}
+.nchip[aria-current=page]{background:var(--ink);color:var(--bg);border-color:var(--ink);font-weight:700}
+.nday{font-family:var(--px);font-weight:400;font-size:14px;color:var(--muted);margin:24px 0 10px}
+.nday::first-letter{text-transform:uppercase}
+.nlist{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.nitem{display:flex;gap:12px;align-items:flex-start;background:var(--raised);border:1px solid var(--line);border-radius:var(--r-lg);padding:12px 14px}
+.nico{flex:0 0 36px;width:36px;height:36px;border-radius:9px;overflow:hidden;display:block}
+.nico img,.nico svg{width:36px;height:36px;display:block}
+.nitem>div{min-width:0;flex:1}
+.nhd{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.nhd b{font-size:15px}
+.nv{font-family:var(--px);font-size:11px;color:var(--muted)}
+.nv.cur{color:var(--c2,#C6F24E)}
+:root[data-theme=light] .nv.cur{color:#4E7A00}
+.nitem ul{margin:4px 0 0;padding-left:18px;font-size:14px;line-height:1.45;color:var(--ink)}
+.nitem li+li{margin-top:2px}
+.foot-ver{font-size:12px;color:var(--muted);text-decoration:none}
+.foot-ver:hover{color:var(--ink)}
 </style>
 </head>
 <body>
@@ -730,6 +750,14 @@ body:not(.is-admin) .adm-only{display:none!important}
 <div id="adm"></div>
 </div></div>
 
+<!-- NOUVEAUTES -->
+<div class="view" id="v-nouveautes"><div class="wrap page">
+<a class="back" href="#accueil"><svg class="pi" viewBox="0 0 8 8" aria-hidden="true"><use href="#i-back"/></svg>ACCUEIL</a>
+<h1 class="px">Nouveautés</h1>
+<p class="lead">Toutes les mises à jour du store et des jeux, de la plus récente à la plus ancienne.</p>
+<div id="news"></div>
+</div></div>
+
 <!-- CONFIDENTIALITE -->
 <div class="view" id="v-confidentialite"><div class="wrap page legal">
 <a class="back" href="#accueil"><svg class="pi" viewBox="0 0 8 8" aria-hidden="true"><use href="#i-back"/></svg>ACCUEIL</a>
@@ -755,8 +783,9 @@ body:not(.is-admin) .adm-only{display:none!important}
 
 <footer><div class="wrap">
 <svg class="wm" viewBox="0 0 64.6 8" shape-rendering="crispEdges" role="img" aria-label="iiGameStudio"><use href="#wm"/></svg>
-<nav class="foot-links" aria-label="Liens utiles"><a href="#installer">Installer</a><a href="#confidentialite">Confidentialité</a><a href="mailto:iigamestudio@gmail.com">Contact</a></nav>
+<nav class="foot-links" aria-label="Liens utiles"><a href="#nouveautes">Nouveautés</a><a href="#installer">Installer</a><a href="#confidentialite">Confidentialité</a><a href="mailto:iigamestudio@gmail.com">Contact</a></nav>
 <span>Les jeux du studio qui n'existe pas.</span>
+<a class="foot-ver" href="#nouveautes-store" id="foot-ver"></a>
 </div></footer>
 
 <div class="upd" id="upd" role="status" aria-live="polite" hidden>
@@ -819,6 +848,41 @@ const card=k=>{const g=GAMES[k];return `<a class="card" href="#jeu-${k}"><div cl
 const mys=`<div class="card mys"><div class="thumb q" aria-hidden="true"><span>?</span></div><div class="body"><span class="ico q" aria-hidden="true">?</span><div class="meta"><h3>???</h3><p>En développement. On n'en dit pas plus.</p></div><span class="get" aria-hidden="true">BIENTÔT</span></div></div>`;
 $('#grid').innerHTML=card('ntd')+card('vertical')+mys+mys+mys;
 
+// ---- Nouveautés : journal des mises à jour du store et des jeux.
+const NEWS_APPS={store:{name:'Store',icon:null},ntd:{name:'Nine Tiles Dungeon',icon:'icon-ntd',k:'ntd'},slime:{name:'Slime Vertical',icon:'icon-vertical',k:'vertical'}};
+let NEWS=null; // chargé depuis /changelog.json (voir README : à compléter à chaque mise à jour)
+fetch('/changelog.json',{cache:'no-cache'}).then(r=>r.ok?r.json():[]).then(a=>{NEWS=(Array.isArray(a)?a:[]).map(n=>({app:n.app,v:n.v,d:n.date,t:n.notes||[]})).sort((x,y)=>y.d.localeCompare(x.d)||y.v-x.v);onNews()}).catch(()=>{NEWS=[];onNews()});
+function onNews(){
+ const n=lastNews('store'),el=$('#foot-ver');if(n&&el)el.textContent='Store v'+n.v+' · '+dShort(n.d);
+ $$('[data-ver]').forEach(d=>{const k=d.dataset.ver,x=lastNews(NEWS_DB[k]);if(x){d.innerHTML=`<dt>VERSION</dt><dd>v${x.v} · ${dShort(x.d)} · <a href="#nouveautes-${k}">nouveautés</a></dd>`;d.hidden=false}});
+ if((location.hash||'').startsWith('#nouveautes'))drawNews();
+}
+const NEWS_DB={ntd:'ntd',vertical:'slime'};
+const lastNews=app=>NEWS&&NEWS.find(n=>n.app===app);
+const dShort=d=>new Date(d).toLocaleDateString('fr-FR',{day:'numeric',month:'short'});
+const dLong=d=>new Date(d).toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'});
+function newsIcon(app){const a=NEWS_APPS[app];return a.icon?`<img src="${IMG[a.icon]}" alt="">`:`<svg viewBox="0 0 500 500" aria-hidden="true"><use href="#logo"/></svg>`}
+function drawNews(){
+ const el=$('#news');if(!el)return;
+ const h=(location.hash||'').slice(1),f=h.startsWith('nouveautes-')?h.slice(11):'tout';
+ const app=f==='tout'?null:(NEWS_DB[f]||f);
+ if(!NEWS){el.innerHTML='<p class="rv-msg">Chargement…</p>';return}
+ const list=NEWS.filter(n=>!app||n.app===app);
+ const latest={};
+ const chips=[['tout','Tout'],['store','Store'],['ntd','Nine Tiles Dungeon'],['vertical','Slime Vertical']].map(([v,t])=>`<a class="nchip" href="#${v==='tout'?'nouveautes':'nouveautes-'+v}"${f===v?' aria-current="page"':''}>${t}</a>`).join('');
+ let day='',html='';
+ for(const n of list){
+  const dk=n.d.slice(0,10);
+  if(dk!==day){if(day)html+='</ol>';day=dk;html+=`<h2 class="nday">${dLong(n.d)}</h2><ol class="nlist">`}
+  const cur=!latest[n.app];latest[n.app]=1;
+  const a=NEWS_APPS[n.app];
+  html+=`<li class="nitem"><span class="nico">${newsIcon(n.app)}</span><div><div class="nhd"><b>${esc(a.name)}</b><span class="nv${cur?' cur':''}">v${n.v}${cur?' · actuelle':''}</span></div><ul>${n.t.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div></li>`;
+ }
+ if(day)html+='</ol>';
+ el.innerHTML=`<nav class="nchips" aria-label="Filtrer">${chips}</nav>${html||'<p class="adm-empty">Rien pour l\'instant.</p>'}`;
+}
+function verRow(k){return `<div data-ver="${k}" hidden></div>`}
+
 // fiches jeu
 for(const k in GAMES){const g=GAMES[k];
  $('#v-jeu-'+k).innerHTML=`<div class="gp wrap">
@@ -840,7 +904,7 @@ for(const k in GAMES){const g=GAMES[k];
  <h2 class="px s" id="avis-${k}">Avis des joueurs</h2>
  <div class="rv-zone"><div class="rv-left"><div class="rv-sum" data-sum="${k}"></div><div data-form="${k}"></div></div><div class="rv-list" data-list="${k}"></div></div>
  <h2 class="px s">Fiche du jeu</h2>
- <dl>${g.facts.map(f=>`<div><dt>${f[0]}</dt><dd>${f[1]}</dd></div>`).join('')}</dl>
+ <dl>${g.facts.map(f=>`<div><dt>${f[0]}</dt><dd>${f[1]}</dd></div>`).join('')}${verRow(k)}</dl>
  </div>
  <div class="sticky-play"><a class="btn wide" href="#lancement-${k}">${pi('play')}JOUER</a></div>`;
 }
@@ -1379,8 +1443,8 @@ document.addEventListener('click',e=>{if(e.target.closest('.join-x')){try{localS
 
 // ---- Retour contextuel : les liens « retour » ramènent à l'écran d'où l'on vient
 const ROUTES=[];
-const viewOf=h=>/^(classement|avis)-/.test(h)?'jeu-'+h.replace(/^(classement|avis)-/,''):h==='jeux'||h==='studio'?'accueil':h.startsWith('installer')?'installer':h.startsWith('admin')?'admin':h;
-const routeLabel=h=>/^(classement|avis)-/.test(h)?routeLabel('jeu-'+h.replace(/^(classement|avis)-/,'')):h==='accueil'?'ACCUEIL':h==='jeux'?'TOUS LES JEUX':h==='studio'?'LE STUDIO':h.startsWith('jeu-')&&GAMES[h.slice(4)]?GAMES[h.slice(4)].name.toUpperCase():h==='compte'?'MON COMPTE':h.startsWith('installer')?'INSTALLER':h.startsWith('admin')?'ADMIN':h==='confidentialite'?'CONFIDENTIALITÉ':'ACCUEIL';
+const viewOf=h=>h.startsWith('nouveautes')?'nouveautes':/^(classement|avis)-/.test(h)?'jeu-'+h.replace(/^(classement|avis)-/,''):h==='jeux'||h==='studio'?'accueil':h.startsWith('installer')?'installer':h.startsWith('admin')?'admin':h;
+const routeLabel=h=>/^(classement|avis)-/.test(h)?routeLabel('jeu-'+h.replace(/^(classement|avis)-/,'')):h==='accueil'?'ACCUEIL':h==='jeux'?'TOUS LES JEUX':h==='studio'?'LE STUDIO':h.startsWith('jeu-')&&GAMES[h.slice(4)]?GAMES[h.slice(4)].name.toUpperCase():h==='compte'?'MON COMPTE':h.startsWith('installer')?'INSTALLER':h.startsWith('admin')?'ADMIN':h==='confidentialite'?'CONFIDENTIALITÉ':h.startsWith('nouveautes')?'NOUVEAUTÉS':'ACCUEIL';
 function pushRoute(h){
  if(ROUTES.length>=2&&ROUTES[ROUTES.length-2]===h)ROUTES.pop();
  else if(ROUTES[ROUTES.length-1]!==h){ROUTES.push(h);if(ROUTES.length>30)ROUTES.shift()}
@@ -1416,6 +1480,7 @@ function show(){
  let view=h,scroll=null,tab=h;
  if(h==='jeux'){view='accueil';scroll='#jeux-section'}
  if(h==='studio'){view='accueil';scroll='#studio-section'}
+ if(h==='nouveautes'||h.startsWith('nouveautes-')){view='nouveautes';drawNews()}
  const sec=/^(classement|avis)-(.+)$/.exec(h);
  if(sec&&GAMES[sec[2]]){view='jeu-'+sec[2];scroll='#'+h}
  if(view.startsWith('jeu-')){tab='jeux';const gk=view.slice(4);if(GAMES[gk]){loadReviews(gk);loadBoard(gk)}}
