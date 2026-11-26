@@ -1,4 +1,5 @@
 [
+  {"app": "store", "v": 18, "date": "2026-11-26T20:05", "notes": ["Coulisses : des garde-fous pour garder des classements honnêtes."]},
   {"app": "store", "v": 17, "date": "2026-11-26T19:25", "notes": ["Nouvelle page Nouveautés : toutes les mises à jour du store et des jeux.", "La version de chaque jeu dans sa fiche, celle du store en bas de page."]},
   {"app": "store", "v": 16, "date": "2026-11-26T18:42", "notes": ["Un bandeau discret prévient quand une nouvelle version est disponible : un toucher sur ACTUALISER suffit."]},
   {"app": "store", "v": 15, "date": "2026-11-26T18:30", "notes": ["Le classement de Nine Tiles Dungeon se fait maintenant au rang du joueur."]},

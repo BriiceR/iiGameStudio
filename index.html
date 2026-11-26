@@ -640,6 +640,14 @@ body:not(.is-admin) .adm-only{display:none!important}
 .nitem li+li{margin-top:2px}
 .foot-ver{font-size:12px;color:var(--muted);text-decoration:none}
 .foot-ver:hover{color:var(--ink)}
+.plist li{flex-wrap:wrap}
+.pscores{flex-basis:100%;display:flex;flex-direction:column;gap:6px;padding-left:44px}
+.pchip{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:13px;color:var(--muted);background:var(--stage);border-radius:var(--r);padding:6px 6px 6px 10px}
+.pchip b{color:var(--ink);font-weight:600}
+.pchip em{font-style:normal;color:var(--coin)}
+.pchip.sus{box-shadow:inset 0 0 0 1px var(--coin)}
+.pchip.off{opacity:.75}
+.pchip button{margin-left:auto;min-height:36px;padding:0 10px;font:inherit;font-size:13px;color:var(--vtext);background:none;border:0;cursor:pointer}
 </style>
 </head>
 <body>
@@ -1113,7 +1121,8 @@ async function loadAvas(ids){
  ids=ids.filter(i=>!(i in A.avas));if(!ids.length)return;
  const {data}=await S.sb.from('profiles').select('id,avatar').in('id',ids);(data||[]).forEach(x=>A.avas[x.id]=x.avatar);
 }
-async function loadAdminStats(){
+async function loadSusCount(){const since=new Date(Date.now()-7*86400000).toISOString();const {data}=await S.sb.from('admin_actions').select('target').eq('action','score_suspect').gte('created_at',since);A.susN=new Set((data||[]).map(x=>x.target)).size}
+async function loadAdminStats(){loadSusCount().then(()=>{if(admSub()==='bord')drawAdmin()});
  A.loading=true;A.err=null;drawAdmin();
  const {data,error}=await S.sb.rpc('admin_stats',{p_period:A.period,p_me:A.me});
  A.loading=false;if(error){A.err=error.message}else{A.stats=data;A.pending=data.reported;setAdminBadge();await loadAvas((data.recent||[]).map(x=>x.id))}
@@ -1129,8 +1138,27 @@ async function loadAdminReviews(){
  A.pending=Object.keys(A.reps).length;setAdminBadge();drawAdmin();
 }
 async function loadAdminPlayers(){
- const {data,error}=await S.sb.rpc('admin_players');
- A.plErr=error?error.message:null;A.players=data||[];await loadAvas(A.players.map(x=>x.id));drawAdmin();
+ const since=new Date(Date.now()-7*86400000).toISOString();
+ const [pl,sc,bn,su]=await Promise.all([
+  S.sb.rpc('admin_players'),
+  S.sb.from('scores').select('user_id,game_id,score'),
+  S.sb.from('score_bans').select('user_id,game_id'),
+  S.sb.from('admin_actions').select('target,details,created_at').eq('action','score_suspect').gte('created_at',since)
+ ]);
+ A.plErr=pl.error?pl.error.message:null;A.players=pl.data||[];
+ A.sc={};(sc.data||[]).forEach(x=>A.sc[x.user_id+'|'+x.game_id]=x.score);
+ A.bans={};(bn.data||[]).forEach(x=>A.bans[x.user_id+'|'+x.game_id]=1);
+ A.sus={};(su.data||[]).forEach(x=>{const d=x.details||{};A.sus[d.user+'|'+d.game]=d});
+ await loadAvas(A.players.map(x=>x.id));drawAdmin();
+}
+async function scoreAct(act,u,g){
+ const key=u+'|'+g;A.busy[key]=true;drawAdmin();
+ let err=null;
+ if(act==='ban'){({error:err}=await S.sb.from('score_bans').insert({user_id:u,game_id:g}));if(!err)await S.sb.from('scores').delete().eq('user_id',u).eq('game_id',g)}
+ else{({error:err}=await S.sb.from('score_bans').delete().eq('user_id',u).eq('game_id',g))}
+ if(!err)await S.sb.from('admin_actions').insert({action:act==='ban'?'score_ban':'score_unban',target:'score:'+g+':'+u});
+ A.busy[key]=false;if(err)alertMsg("L'action n'a pas marché, réessaie.");
+ await loadAdminPlayers();
 }
 
 function chartSvg(series,hourly){
@@ -1155,7 +1183,8 @@ function drawBord(){
  if(!s)return seg+`<p class="adm-empty">Chargement…</p>`;
  const v=delta(s.visits,s.visits_prev),l=delta(s.launches,s.launches_prev);
  const kp=(t,n,e,up)=>`<div class="kpi"><small>${t}</small><strong>${n}</strong><em${up?' class="up"':''}>${e||'&nbsp;'}</em></div>`;
- const alert=s.reported?`<a class="adm-alert" href="#admin-avis"><svg class="pi" viewBox="0 0 8 8" aria-hidden="true"><use href="#i-bell"/></svg><span><b>${s.reported} avis signalé${s.reported>1?'s':''}</b>À regarder dans la modération</span><span aria-hidden="true" style="flex:0;font-size:20px;color:var(--coin)">›</span></a>`:'';
+ const susA=A.susN?`<a class="adm-alert" href="#admin-joueurs"><svg class="pi" viewBox="0 0 8 8" aria-hidden="true"><use href="#i-chart"/></svg><span><b>${A.susN} score${A.susN>1?'s':''} suspect${A.susN>1?'s':''}</b>Un bond anormal dans un classement, à vérifier</span><span aria-hidden="true" style="flex:0;font-size:20px;color:var(--coin)">›</span></a>`:'';
+ const alert=susA+(s.reported?`<a class="adm-alert" href="#admin-avis"><svg class="pi" viewBox="0 0 8 8" aria-hidden="true"><use href="#i-bell"/></svg><span><b>${s.reported} avis signalé${s.reported>1?'s':''}</b>À regarder dans la modération</span><span aria-hidden="true" style="flex:0;font-size:20px;color:var(--coin)">›</span></a>`:'');
  const games=(s.games||[]).map(g=>{const m=GBY[g.id]||{name:g.id,icon:''};return `<article class="adm-box gstat"><div class="hd">${m.icon?`<img src="${m.icon}" alt="">`:''}<h3>${esc(m.name)}</h3>${g.rating?`<b>★ ${fmt(g.rating)}</b>`:''}</div><div class="cells"><div><b>${nf(g.launches)}</b><span>parties</span></div><div><b>${nf(g.players)}</b><span>sessions</span></div><div><b>${dur(g.play_s)}</b><span>de jeu</span></div><div><b>${nf(g.reviews)}</b><span>avis</span></div></div></article>`}).join('');
  const recent=(s.recent||[]).map(p=>`<li>${avBox(p.id,A.avas[p.id])}<span class="nm">${esc(p.name)}${p.role==='admin'?'<span class="atag">ADMIN</span>':''}</span><span class="rt">${ago(p.created_at)}</span></li>`).join('');
  return seg+alert+`<div class="kpis" aria-busy="${A.loading}">
@@ -1203,7 +1232,12 @@ function drawJoueurs(){
  if(A.plErr)return `<p class="adm-empty">Impossible de charger les joueurs. <button class="btn sm ghost" type="button" data-adm-act="reload">RÉESSAYER</button></p>`;
  if(!A.players)return `<p class="adm-empty">Chargement…</p>`;
  if(!A.players.length)return `<p class="adm-empty">Aucun compte pour l'instant.</p>`;
- return `<p class="lead" style="margin-bottom:14px">${A.players.length} compte${A.players.length>1?'s':''}. Les adresses e-mail ne sont pas affichées ici.</p><ul class="plist">${A.players.map(p=>`<li>${avBox(p.id,A.avas[p.id])}<span class="nm">${esc(p.name)}${p.role==='admin'?'<span class="atag">ADMIN</span>':''}<small>Inscrit le ${day(p.created_at)} · vu ${ago(p.last_seen)}</small></span><span class="rt">${nf(p.launches)} partie${p.launches>1?'s':''}<br>${nf(p.reviews)} avis</span></li>`).join('')}</ul>`;
+ const chips=p=>Object.keys(GBY).map(db=>{const key=p.id+'|'+db,sc=A.sc&&A.sc[key],ban=A.bans&&A.bans[key],su=A.sus&&A.sus[key],f=LBF[db]||{fmt:v=>v},b=A.busy[key]?' disabled':'';
+  if(!sc&&!ban)return '';
+  return `<span class="pchip${su&&!ban?' sus':''}${ban?' off':''}"><b>${esc(GBY[db].name)}</b> ${ban?'retiré du classement':esc(f.fmt(sc))}${su&&!ban?` <em title="Bond suspect">⚠ bond : ${esc(f.fmt(su.avant))} → ${esc(f.fmt(su.apres))}</em>`:''}<button type="button" data-adm-act="${ban?'unban':'ban'}" data-u="${p.id}" data-g="${db}"${b}>${ban?'Réintégrer':'Retirer'}</button></span>`}).join('');
+ const nsus=Object.keys(A.sus||{}).filter(k=>!(A.bans||{})[k]).length;
+ return `<p class="lead" style="margin-bottom:14px">${A.players.length} compte${A.players.length>1?'s':''}. Les adresses e-mail ne sont pas affichées ici.</p>${nsus?`<p class="rv-msg err" style="margin-bottom:12px">⚠ ${nsus} score${nsus>1?'s':''} au bond suspect cette semaine : vérifie et retire le joueur du classement si besoin.</p>`:''}<ul class="plist">${A.players.map(p=>{const c=chips(p);return `<li>${avBox(p.id,A.avas[p.id])}<span class="nm">${esc(p.name)}${p.role==='admin'?'<span class="atag">ADMIN</span>':''}<small>Inscrit le ${day(p.created_at)} · vu ${ago(p.last_seen)}</small></span><span class="rt">${nf(p.launches)} partie${p.launches>1?'s':''}<br>${nf(p.reviews)} avis</span>${c?`<div class="pscores">${c}</div>`:''}</li>`}).join('')}</ul>
+ <p class="note">Retirer un joueur l'enlève du classement de ce jeu, même s'il continue à jouer. Réintégré, il réapparaît à sa prochaine sauvegarde.</p>`;
 }
 
 function admSub(){const h=(location.hash||'').slice(1);return h==='admin-avis'?'avis':h==='admin-joueurs'?'joueurs':'bord'}
@@ -1245,6 +1279,7 @@ document.addEventListener('click',e=>{
  const a=b.dataset.admAct;
  if(a==='reload'){openAdmin();return}
  if(a==='hide'||a==='show'||a==='keep')modAct(a,b.dataset.id);
+ if(a==='ban'||a==='unban')scoreAct(a,b.dataset.u,b.dataset.g);
 });
 document.addEventListener('change',e=>{if(e.target.id==='adm-me'){A.me=e.target.checked;loadAdminStats()}});
 
