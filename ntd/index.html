@@ -1,4 +1,23 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><script src="/cloud.js"></script>
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><script>/* iPhone, appli installée : la hauteur donnée par Safari oublie la barre d'état
+   sous laquelle passe la page. On mesure la vraie hauteur et on cale le jeu dessus. */
+(function(){
+  var ios=/iPhone|iPad|iPod/.test(navigator.userAgent)||(/Macintosh/.test(navigator.userAgent)&&navigator.maxTouchPoints>1);
+  function seul(){return (window.matchMedia&&matchMedia('(display-mode: standalone)').matches)||navigator.standalone===true}
+  function caler(){
+    var h=window.innerHeight;
+    if(ios&&seul()&&screen&&screen.height){
+      var portrait=window.matchMedia?matchMedia('(orientation: portrait)').matches:h>window.innerWidth;
+      var sh=portrait?Math.max(screen.width,screen.height):Math.min(screen.width,screen.height);
+      if(sh>h) h=sh;
+    }
+    document.documentElement.style.setProperty('--app-h',h+'px');
+  }
+  caler();
+  addEventListener('resize',caler);
+  addEventListener('orientationchange',function(){setTimeout(caler,250)});
+  addEventListener('pageshow',caler);
+})();</script>
+<script src="/cloud.js"></script>
 </head><body>
 <title>Nine Tiles Dungeon</title>
 <link rel="manifest" href="/ntd/manifest.webmanifest">
@@ -74,7 +93,9 @@
   --f-titre:"Silkscreen","Courier New",monospace;
   --f-texte:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
 }
-html,body{height:100%}
+/* hauteur réelle de l'écran (voir le script --app-h) : Safari la sous-estime dans l'appli installée */
+html{height:var(--app-h,100%)}
+body{height:100%}
 body{
   background:
     radial-gradient(ellipse 80% 50% at 50% 45%, rgba(var(--lueur),.12), transparent 70%),
