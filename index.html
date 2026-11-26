@@ -553,6 +553,17 @@ body:not(.is-admin) .adm-only{display:none!important}
 .lb .lb-n{font-size:13px;color:var(--muted);margin-top:10px}
 .lb .lb-n a{color:var(--vtext)}
 .lb sup,.mg-rk sup{font-size:.65em;vertical-align:.45em;line-height:0}
+.perks{list-style:none;margin:0 0 18px;padding:0;display:grid;gap:10px}
+.perks li{display:flex;gap:12px;align-items:flex-start;background:var(--raised);border:1px solid var(--line);border-radius:var(--r-lg);padding:12px 14px}
+.perks .pi{width:22px;height:22px;flex:0 0 22px;color:var(--vtext);margin-top:2px}
+.perks span{display:flex;flex-direction:column;font-size:13px;color:var(--muted);line-height:1.4}
+.perks b{font-size:15px;color:var(--ink);font-weight:600}
+.lb-lock{position:relative;border-radius:var(--r-lg);overflow:hidden}
+.lb-lock ol{filter:blur(5px);opacity:.55;pointer-events:none;user-select:none}
+.lb-lock .cta{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center;padding:16px;background:color-mix(in srgb,var(--bg) 35%,transparent)}
+.lb-lock .cta b{font-family:var(--px);font-weight:400;font-size:16px}
+.lb-lock .cta p{font-size:13px;color:var(--muted);max-width:300px}
+.lb-lock .cta .pi{width:28px;height:28px;color:var(--vtext)}
 </style>
 </head>
 <body>
@@ -868,7 +879,8 @@ function drawAccount(){
  if(uid()){drawLoggedIn(el);return}
  const L=S.login;
  if(L.step==='email'){
-  el.innerHTML=`<p class="lead">Un compte sert à noter les jeux et laisser des avis. Pas de mot de passe : on t'envoie un e-mail.</p>
+  el.innerHTML=`<p class="lead">Crée ton compte gratuit, sans mot de passe : on t'envoie un code par e-mail.</p>
+  <ul class="perks"><li>${pi('chart')}<span><b>Les classements</b>Vois qui est en tête et entre dans le top avec tes records.</span></li><li>${pi('dl')}<span><b>Ta progression partout</b>Sauvegardée en ligne : reprends sur ton téléphone, ta tablette ou ton ordi.</span></li><li>${pi('user')}<span><b>Ton profil</b>Un pseudo, un avatar pixel, tes stats de jeu.</span></li><li>${pi('star')}<span><b>Tes avis</b>Note les jeux et dis ce que tu en penses.</span></li></ul>
   <form class="acct-card" id="mail-f" novalidate><label for="mail-in" class="rv-msg">Ton adresse e-mail</label><input id="mail-in" type="email" inputmode="email" autocomplete="email" required value="${esc(L.email)}" placeholder="toi@exemple.fr" style="font:inherit;font-size:16px;color:var(--ink);background:var(--bg);border:2px solid var(--line);border-radius:var(--r);padding:12px"><button class="btn wide" type="submit"${L.busy?' disabled':''}>${L.busy?'ENVOI…':'RECEVOIR MON CODE'}</button>${L.msg?`<p class="rv-msg${L.msg.err?' err':''}" role="status">${esc(L.msg.t)}</p>`:''}</form>`;
  }else{
   el.innerHTML=`<div class="acct-card"><h2>Regarde tes e-mails</h2><p class="rv-msg">On a envoyé un e-mail à <b>${esc(L.email)}</b>. Touche le lien dedans, ou tape ici le code qu'il contient. Si tu as installé l'appli, utilise le code.</p>
@@ -1238,6 +1250,7 @@ async function myRank(db){
 }
 async function loadBoard(k){
  if(!S.sb)return;
+ if(!uid()){LB[k]=null;drawBoard(k);return}
  const db=GAMES[k].db;
  const [top,me]=await Promise.all([
   S.sb.from('scores').select('user_id,score,updated_at,profiles(display_name,avatar)').eq('game_id',db).order('score',{ascending:false}).order('updated_at',{ascending:true}).limit(10),
@@ -1248,6 +1261,11 @@ async function loadBoard(k){
 function drawBoard(k){
  const el=$(`[data-lb="${k}"]`);if(!el)return;
  const b=LB[k],f=LBF[GAMES[k].db]||{what:'',fmt:v=>v};
+ if(!uid()){
+  const fake=['crane-jaune','fantome-cyan','chat-orange','slime-violet','crane-rose'].map((a,i)=>`<li><span class="rk${i<3?' r'+(i+1):''}">${i+1}</span>${avaSvg(a,26)}<span class="nm">${'Joueur'.padEnd(6+i%3,'•')}</span><span class="sc">${f.fmt([1840,1260,960,610,330][i]*(GAMES[k].db==='slime'?.1:1))}</span></li>`).join('');
+  el.innerHTML=`<p class="lb-k">${f.what}</p><div class="lb-lock"><ol aria-hidden="true">${fake}</ol><div class="cta"><svg class="pi" viewBox="0 0 8 8" aria-hidden="true"><use href="#i-user"/></svg><b>Réservé aux membres</b><p>Crée ton compte gratuit pour voir le classement et y entrer avec tes records.</p><a class="btn sm" href="#compte">CRÉER MON COMPTE</a></div></div>`;
+  return;
+ }
  if(!b){el.innerHTML='<p class="lb-k">Chargement…</p>';return}
  if(b.err){el.innerHTML='<p class="lb-k">Le classement ne répond pas pour l\'instant.</p>';return}
  const row=(r,rank)=>{const mine=r.user_id===uid();return `<li class="${mine?'me':''}"><span class="rk${rank<=3?' r'+rank:''}">${rank}</span>${avaSvg(r.profiles?.avatar,26)}<span class="nm">${esc(r.profiles?.display_name||'Joueur')}${mine?'<small>toi</small>':''}</span><span class="sc">${f.fmt(r.score)}</span></li>`};
