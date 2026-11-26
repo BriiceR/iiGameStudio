@@ -585,6 +585,29 @@ body:not(.is-admin) .adm-only{display:none!important}
  .join-go{width:auto}
  .join-x{align-self:center;margin:0}
 }
+/* avis : version compacte */
+.rv-sum{padding:14px 16px;gap:16px}
+.rv-avg strong{font-size:32px}
+.rv-bars{gap:3px}
+.rv-bar{font-size:11px;grid-template-columns:10px 1fr 18px}
+.rv-bar i{height:6px}
+.rv-sum.slim{display:block;padding:12px 16px}
+.rv-line{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.rv-line strong{font-family:var(--px);font-weight:400;font-size:24px;line-height:1}
+.rv-line span{color:var(--muted);font-size:13px}
+.rv-cta{margin-top:12px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;background:var(--raised);border:1px solid var(--line);border-radius:var(--r-lg);padding:10px 12px 10px 16px;font-size:14px;color:var(--muted)}
+.rv-write{margin-top:12px}
+.rv-more{width:100%;min-height:44px;font:inherit;font-size:14px;color:var(--vtext);background:none;border:1px dashed var(--line);border-radius:var(--r-lg);cursor:pointer}
+.rv.mine .rv-acts{margin:-4px 0 -8px -8px}
+.rv{padding:12px 14px;gap:4px}
+.rv-who>span{display:flex;flex-direction:column;line-height:1.2}
+.rv-who small.rv-date{font-size:12px;color:var(--muted);font-weight:400}
+.rv .rv-acts{margin:-6px 0 -10px -8px}
+.rv-cta{flex-wrap:nowrap}
+.rv-cta .btn{flex:none}
+.by{font-size:13px;color:var(--muted);margin:-2px 0 8px}
+.by b{color:var(--vtext);font-weight:600}
+.card .by{display:block;margin:2px 0 4px;font-size:12px}
 </style>
 </head>
 <body>
@@ -642,6 +665,7 @@ body:not(.is-admin) .adm-only{display:none!important}
 <div class="txt">
 <div class="row"><span class="tag new">À LA UNE</span><span class="tag">JOUABLE</span></div>
 <h2 id="une" class="px">Nine Tiles Dungeon</h2>
+<p class="by">Un jeu de <b>Brice</b></p>
 <p class="muted">Un donjon de neuf cases, des monstres, des coffres et beaucoup de malchance. Tu meurs, tu recommences, tu descends un peu plus bas.</p>
 <p class="muted" style="font-size:13px">Die and retry · 5 chapitres · mode sans fin</p>
 <div class="acts"><a class="btn" href="#lancement-ntd"><svg class="pi" viewBox="0 0 8 8" aria-hidden="true"><use href="#i-play"/></svg>JOUER</a><a href="#jeu-ntd" class="link-px">EN SAVOIR PLUS</a></div>
@@ -753,16 +777,16 @@ body:not(.is-admin) .adm-only{display:none!important}
 const IMG={'ntd-titre':'/img/ntd-titre.webp','ntd-menu':'/img/ntd-menu.webp','ntd-carte':'/img/ntd-carte.webp','vertical-jeu':'/img/vertical-jeu.webp','icon-ntd':'/img/icon-ntd.svg','icon-vertical':'/img/icon-slime.svg'};
 {
 const GAMES={
- ntd:{url:'/ntd/',db:'ntd',name:'Nine Tiles Dungeon',tag:'JOUABLE',short:'Die and retry de donjon sur neuf cases.',img:'ntd-titre',icon:'icon-ntd',shots:['ntd-menu','ntd-titre','ntd-carte'],
+ ntd:{url:'/ntd/',db:'ntd',name:'Nine Tiles Dungeon',author:'Brice',tag:'JOUABLE',short:'Die and retry de donjon sur neuf cases.',img:'ntd-titre',icon:'icon-ntd',shots:['ntd-menu','ntd-titre','ntd-carte'],
   lead:"Neuf cases. Cinq niveaux. Beaucoup de morts. Des monstres, des coffres qui cachent des pouvoirs, et un donjon qui ne pardonne rien.",
   kind:'DIE AND RETRY',
   steps:[["Avance case par case","Chaque coup compte. Pas d'aperçu : c'est à toi d'anticiper."],["Ouvre les coffres","Dix pouvoirs à trouver : foudre, glace, aimant, sangsue…"],["Bats les gardiens","Cinq chapitres de dix niveaux, un gardien au bout de chacun."]],
-  facts:[['GENRE','Die and retry, donjon'],['CONTENU','5 chapitres, défi du jour, mode sans fin'],['OÙ JOUER','Navigateur, téléphone ou ordi'],['PRIX','Gratuit']]},
- vertical:{url:'/slime/',db:'slime',name:'Slime Vertical',tag:'JOUABLE',short:'Saute, ramasse les pièces, monte le plus haut possible.',img:'vertical-jeu',icon:'icon-vertical',shots:['vertical-jeu','vertical-jeu','vertical-jeu'],
+  facts:[['AUTEUR','Brice'],['GENRE','Die and retry, donjon'],['CONTENU','5 chapitres, défi du jour, mode sans fin'],['OÙ JOUER','Navigateur, téléphone ou ordi'],['PRIX','Gratuit']]},
+ vertical:{url:'/slime/',db:'slime',name:'Slime Vertical',author:'Tom',tag:'JOUABLE',short:'Saute, ramasse les pièces, monte le plus haut possible.',img:'vertical-jeu',icon:'icon-vertical',shots:['vertical-jeu','vertical-jeu','vertical-jeu'],
   lead:"Un slime bleu, des plates-formes au hasard et un seul but : monter. Si tu sors de l'écran, c'est fini. Ton score, c'est ta hauteur.",
   kind:'PLATE-FORME',
   steps:[["Saute de plate-forme en plate-forme","Gauche, droite, saut. Les plates-formes sont toujours atteignables… de justesse."],["Ramasse les pièces","Elles restent à toi même quand tu tombes."],["Dépense-les au magasin","Cœur, saut plus grand, vitesse, fusée : de quoi battre ton record."]],
-  facts:[['GENRE','Plate-forme verticale'],['SCORE','La hauteur atteinte, record gardé'],['OÙ JOUER','Navigateur, téléphone ou ordi'],['PRIX','Gratuit']]}
+  facts:[['AUTEUR','Tom'],['GENRE','Plate-forme verticale'],['SCORE','La hauteur atteinte, record gardé'],['OÙ JOUER','Navigateur, téléphone ou ordi'],['PRIX','Gratuit']]}
 };
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
 const pi=n=>`<svg class="pi" viewBox="0 0 8 8" aria-hidden="true"><use href="#i-${n}"/></svg>`;
@@ -774,7 +798,7 @@ const pat=['v','v','v','v','v','v','n','v','n','v','n','w','w','w','w','n','l','
 $('#band').innerHTML=Array.from({length:150},(_,i)=>{const r=Math.floor(i/50),c=i%50,t=pat[(c+r*7)%pat.length];return `<i class="${t==='v'?'':t}"></i>`}).join('');
 
 // liste des jeux
-const card=k=>{const g=GAMES[k];return `<a class="card" href="#jeu-${k}"><div class="thumb" aria-hidden="true">${phone(g.img)}</div><div class="body">${ico(g.icon)}<div class="meta"><h3>${g.name}</h3><p>${g.short}</p><span class="rate" data-rate="${k}"></span></div><span class="get" aria-hidden="true">JOUER</span></div></a>`};
+const card=k=>{const g=GAMES[k];return `<a class="card" href="#jeu-${k}"><div class="thumb" aria-hidden="true">${phone(g.img)}</div><div class="body">${ico(g.icon)}<div class="meta"><h3>${g.name}</h3><span class="by">par ${g.author}</span><p>${g.short}</p><span class="rate" data-rate="${k}"></span></div><span class="get" aria-hidden="true">JOUER</span></div></a>`};
 const mys=`<div class="card mys"><div class="thumb q" aria-hidden="true"><span>?</span></div><div class="body"><span class="ico q" aria-hidden="true">?</span><div class="meta"><h3>???</h3><p>En développement. On n'en dit pas plus.</p></div><span class="get" aria-hidden="true">BIENTÔT</span></div></div>`;
 $('#grid').innerHTML=card('ntd')+card('vertical')+mys+mys+mys;
 
@@ -783,7 +807,7 @@ for(const k in GAMES){const g=GAMES[k];
  $('#v-jeu-'+k).innerHTML=`<div class="gp wrap">
  <a class="back" href="#jeux">${pi('back')}TOUS LES JEUX</a>
  <div class="gp-top">
-  <div class="gp-head">${ico(g.icon)}<div><h1 class="px">${g.name}</h1><div class="row"><span class="tag new">${g.tag}</span><span class="tag">${g.kind}</span></div><button class="rate-chip" type="button" data-go="avis-${k}"><span class="rate" data-rate="${k}"></span></button></div></div>
+  <div class="gp-head">${ico(g.icon)}<div><h1 class="px">${g.name}</h1><p class="by">Un jeu de <b>${g.author}</b></p><div class="row"><span class="tag new">${g.tag}</span><span class="tag">${g.kind}</span></div><button class="rate-chip" type="button" data-go="avis-${k}"><span class="rate" data-rate="${k}"></span></button></div></div>
   <div class="shots" aria-label="Captures du jeu">${g.shots.map((s,i)=>phone(s,i===1?'mid':'')).join('')}</div>
   <div class="gp-info">
    <p class="lead1">${g.lead}</p>
@@ -848,7 +872,7 @@ const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZ
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const fmt=n=>Number(n).toFixed(1).replace('.',',');
 const starRow=n=>`<span class="stars" aria-label="${fmt(n)} sur 5">${[1,2,3,4,5].map(i=>`<svg class="pi${i<=Math.round(n)?' on':''}" viewBox="0 0 8 8" aria-hidden="true"><use href="#i-star"/></svg>`).join('')}</span>`;
-const S={sb:null,session:null,profile:null,stats:{},reviews:{},loaded:{},draft:{},editing:{},busy:{},msg:{},report:null,reported:{},login:{step:'email',email:'',busy:false,msg:null}};
+const S={more:{},sb:null,session:null,profile:null,stats:{},reviews:{},loaded:{},draft:{},editing:{},busy:{},msg:{},report:null,reported:{},login:{step:'email',email:'',busy:false,msg:null}};
 const uid=()=>S.session?.user?.id||null;
 try{if(window.supabase)S.sb=window.supabase.createClient(SB_URL,SB_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,flowType:'pkce'}})}catch(e){S.sb=null}
 
@@ -880,25 +904,33 @@ function drawReviews(k,force){
  if(!S.loaded[k]){sum.innerHTML='<p class="rv-msg">Chargement des avis…</p>';form.innerHTML='';list.innerHTML='';return}
  if(S.loaded[k]==='err'){sum.innerHTML='';form.innerHTML='';list.innerHTML='<div class="rv-empty">Les avis ne sont pas joignables pour l\'instant.</div>';return}
  const st=S.stats[GAMES[k].db]||{reviews_count:0,rating_avg:0,r5:0,r4:0,r3:0,r2:0,r1:0},c=st.reviews_count;
- sum.innerHTML=`<div class="rv-avg"><strong>${c?fmt(st.rating_avg):'–'}</strong>${starRow(st.rating_avg||0)}<small>${c} avis</small></div><div class="rv-bars">${[5,4,3,2,1].map(n=>{const v=st['r'+n]||0;return `<div class="rv-bar"><span>${n}</span><i><span style="width:${c?Math.round(v/c*100):0}%"></span></i><em>${v}</em></div>`}).join('')}</div>`;
+ sum.classList.toggle('slim',c<3);
+ if(c<3){sum.innerHTML=`<div class="rv-line"><strong>${c?fmt(st.rating_avg):'–'}</strong>${starRow(st.rating_avg||0)}<span>${c?c+' avis':'Pas encore d\'avis'}</span></div>`}
+ else{sum.innerHTML=`<div class="rv-avg"><strong>${c?fmt(st.rating_avg):'–'}</strong>${starRow(st.rating_avg||0)}<small>${c} avis</small></div><div class="rv-bars">${[5,4,3,2,1].map(n=>{const v=st['r'+n]||0;return `<div class="rv-bar"><span>${n}</span><i><span style="width:${c?Math.round(v/c*100):0}%"></span></i><em>${v}</em></div>`}).join('')}</div>`;}
  const all=S.reviews[k]||[],mine=all.find(r=>r.user_id===uid());
  const typing=!force&&form.querySelector('form')&&form.contains(document.activeElement);
  if(typing){}
- else if(!uid()){form.innerHTML=`<div class="rv-form"><h3>Donne ton avis</h3><p class="rv-msg">Connecte-toi pour noter ${esc(GAMES[k].name)}. Pas de mot de passe : un e-mail suffit.</p><a class="btn wide" href="#compte">${pi('user')}SE CONNECTER</a></div>`}
- else if(mine&&!S.editing[k]){form.innerHTML=`<div class="rv-form"><h3>Ton avis</h3>${starRow(mine.rating)}${mine.status==='masque'?'<p class="rv-msg err">Ton avis a été masqué par la modération.</p>':'<p class="rv-msg">Merci ! Tu peux le modifier quand tu veux.</p>'}<div class="rv-acts"><button type="button" data-act="edit" data-k="${k}">Modifier</button><button type="button" data-act="del" data-k="${k}" data-id="${mine.id}">Supprimer</button></div></div>`}
+ else if(!uid()){form.innerHTML=`<div class="rv-cta"><span>Connecte-toi pour noter ce jeu.</span><a class="btn sm" href="#compte">SE CONNECTER</a></div>`}
+ else if(mine&&!S.editing[k]){form.innerHTML=''}
+ else if(!mine&&!S.editing[k]){form.innerHTML=`<button type="button" class="btn ghost wide rv-write" data-act="write" data-k="${k}">${pi('star')}DONNER MON AVIS</button>`}
  else{
   const d=S.draft[k]||(mine?{note:mine.rating,texte:mine.comment||''}:{note:0,texte:''});S.draft[k]=d;
   const name=S.profile?.display_name||'Joueur';
   form.innerHTML=`<form class="rv-form" data-f="${k}" novalidate><h3>${mine?'Modifier ton avis':'Donne ton avis'}</h3>
   <fieldset class="pickstars"><legend class="sr">Ta note sur 5</legend>${[1,2,3,4,5].map(i=>`<input class="sr" type="radio" name="n-${k}" id="n-${k}-${i}" value="${i}"${d.note===i?' checked':''}><label for="n-${k}-${i}" class="${i<=d.note?'on':''}" aria-label="${i} étoile${i>1?'s':''}"><svg class="pi" viewBox="0 0 8 8" aria-hidden="true"><use href="#i-star"/></svg></label>`).join('')}</fieldset>
   <label class="sr" for="t-${k}">Ton commentaire</label><textarea id="t-${k}" maxlength="500" placeholder="Ce que tu as aimé, ce qui t'a rendu fou… (facultatif)">${esc(d.texte)}</textarea>
-  <div class="foot"><span class="count">${d.texte.length}/500</span><button class="btn" type="submit"${S.busy[k]?' disabled':''}>${S.busy[k]?'ENVOI…':'PUBLIER'}</button></div>
+  <div class="foot"><span class="count">${d.texte.length}/500</span><span style="display:flex;gap:8px"><button class="btn ghost" type="button" data-act="cancel" data-k="${k}">ANNULER</button><button class="btn" type="submit"${S.busy[k]?' disabled':''}>${S.busy[k]?'ENVOI…':'PUBLIER'}</button></span></div>
   <p class="rv-msg" style="font-size:13px">Publié sous le nom <b>${esc(name)}</b> · <a href="#compte">modifier</a></p>
   ${S.msg[k]?`<p class="rv-msg${S.msg[k].err?' err':''}" role="status">${esc(S.msg[k].t)}</p>`:''}</form>`;
  }
- list.innerHTML=all.length?all.map(r=>{const me=r.user_id===uid();const who=me?'Toi':(r.profiles?.display_name||'Un joueur');const rep=S.report===r.id;
-  return `<article class="rv${me?' mine':''}"><div class="rv-top"><span class="rv-who">${avaSvg(r.profiles?.avatar,20)}${esc(who)}</span>${starRow(r.rating)}</div><span class="rv-date">${new Date(r.created_at).toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'})}${r.status==='masque'?' · masqué':''}</span>${r.comment?`<p>${esc(r.comment)}</p>`:''}
-  ${!me&&uid()?`<div class="rv-acts">${S.reported[r.id]?'<span class="rv-msg" style="font-size:13px;padding:12px 8px">Merci, c\'est signalé.</span>':rep?`<span class="rv-msg" style="font-size:13px;padding:12px 8px">Signaler cet avis ?</span><button type="button" class="warn" data-act="rep-yes" data-k="${k}" data-id="${r.id}">Oui</button><button type="button" data-act="rep-no" data-k="${k}">Non</button>`:`<button type="button" data-act="rep" data-k="${k}" data-id="${r.id}">Signaler</button>`}</div>`:''}</article>`}).join(''):`<div class="rv-empty">Aucun avis pour l'instant. Sois le premier à noter ${esc(GAMES[k].name)}.</div>`;
+ // le plus positif en haut, seul visible ; les autres se déroulent par note décroissante
+ const sorted=all.filter(r=>!(r===mine&&S.editing[k])).slice().sort((a,b)=>(b.rating-a.rating)||((b.comment?1:0)-(a.comment?1:0))||(new Date(b.created_at)-new Date(a.created_at)));
+ const shown=S.more[k]?sorted:sorted.slice(0,1);
+ const more=sorted.length>1?`<button type="button" class="rv-more" data-act="more" data-k="${k}">${S.more[k]?'Voir moins':'Voir les '+(sorted.length-1)+' autre'+(sorted.length>2?'s':'')+' avis'}</button>`:'';
+ list.innerHTML=sorted.length?shown.map(r=>{const me=r.user_id===uid();const who=me?'Toi':(r.profiles?.display_name||'Un joueur');const rep=S.report===r.id;
+  return `<article class="rv${me?' mine':''}"><div class="rv-top"><span class="rv-who">${avaSvg(r.profiles?.avatar,20)}<span>${esc(who)}<small class="rv-date">${new Date(r.created_at).toLocaleDateString('fr-FR',{day:'numeric',month:'short'})}${r.status==='masque'?' · masqué':''}</small></span></span>${starRow(r.rating)}</div>${r.comment?`<p>${esc(r.comment)}</p>`:''}
+  ${me?`${r.status==='masque'?'<p class="rv-msg err" style="font-size:13px">Masqué par la modération : les autres joueurs ne le voient pas.</p>':''}<div class="rv-acts"><button type="button" data-act="edit" data-k="${k}">Modifier</button><button type="button" class="warn" data-act="del" data-k="${k}" data-id="${r.id}">Supprimer</button></div>`:''}
+  ${!me&&uid()?`<div class="rv-acts">${S.reported[r.id]?'<span class="rv-msg" style="font-size:13px;padding:12px 8px">Merci, c\'est signalé.</span>':rep?`<span class="rv-msg" style="font-size:13px;padding:12px 8px">Signaler cet avis ?</span><button type="button" class="warn" data-act="rep-yes" data-k="${k}" data-id="${r.id}">Oui</button><button type="button" data-act="rep-no" data-k="${k}">Non</button>`:`<button type="button" data-act="rep" data-k="${k}" data-id="${r.id}">Signaler</button>`}</div>`:''}</article>`}).join('')+more:`<div class="rv-empty">Aucun avis pour l'instant. Sois le premier à noter ${esc(GAMES[k].name)}.</div>`;
 }
 function drawAllReviews(){drawRates();Object.keys(GAMES).forEach(k=>drawReviews(k))}
 
@@ -952,7 +984,9 @@ document.addEventListener('click',async e=>{
  if(e.target.id==='back-mail'){S.login={step:'email',email:S.login.email,busy:false,msg:null};drawAccount();return}
  if(e.target.id==='resend'){const {error}=await S.sb.auth.signInWithOtp({email:S.login.email,options:{emailRedirectTo:location.origin+'/'}});S.login.msg=error?{t:"Patiente une minute avant de renvoyer.",err:true}:{t:'E-mail renvoyé.'};drawAccount();return}
  const b=e.target.closest('[data-act]');if(!b)return;const k=b.dataset.k,a=b.dataset.act;
- if(a==='edit'){S.editing[k]=true;drawReviews(k,true);return}
+ if(a==='edit'||a==='write'){S.editing[k]=true;drawReviews(k,true);document.getElementById('t-'+k)?.closest('form')?.scrollIntoView({behavior:'smooth',block:'center'});return}
+ if(a==='cancel'){S.editing[k]=false;S.draft[k]=null;S.msg[k]=null;drawReviews(k,true);return}
+ if(a==='more'){S.more[k]=!S.more[k];drawReviews(k,true);return}
  if(a==='del'){b.disabled=true;const {error}=await S.sb.from('reviews').delete().eq('id',b.dataset.id);if(!error){S.editing[k]=false;S.draft[k]=null;await Promise.all([loadReviews(k),loadStats()])}else b.disabled=false;return}
  if(a==='rep'){S.report=b.dataset.id;drawReviews(k,true);return}
  if(a==='rep-no'){S.report=null;drawReviews(k,true);return}
