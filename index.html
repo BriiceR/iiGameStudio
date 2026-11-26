@@ -517,6 +517,9 @@ body:not(.is-admin) .adm-only{display:none!important}
 .mg-dl dt,.mg-dl dd{display:block;text-align:left}
 .mg-dl dt{font-size:11px;color:var(--muted)}
 .mg-dl dd{margin:2px 0 0;font-family:var(--px);font-size:15px}
+.mg-rk{display:flex;align-items:center;gap:6px;min-height:44px;padding:0 12px;border-radius:var(--r);background:color-mix(in srgb,var(--violet) 16%,var(--stage));color:var(--ink);text-decoration:none;font-size:14px}
+.mg-rk b{font-family:var(--px);font-weight:400;color:var(--vtext)}
+.mg-rk span{margin-left:auto;color:var(--muted);font-size:18px}
 .mg-sv{font-size:12px;color:var(--muted);margin-top:-6px}
 .mg .mine{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted)}
 .acc-list{background:var(--raised);border:1px solid var(--line);border-radius:var(--r-lg);display:flex;flex-direction:column;margin-bottom:12px}
@@ -533,6 +536,23 @@ body:not(.is-admin) .adm-only{display:none!important}
 .del-box .row2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .del-box .btn{min-height:48px;font-size:13px}
 .btn.red{background:#D7264A;color:#fff}
+/* ===== Classements ===== */
+.lb{max-width:640px}
+.lb ol{list-style:none;margin:0;padding:0;background:var(--raised);border:1px solid var(--line);border-radius:var(--r-lg);overflow:hidden}
+.lb li{min-height:52px;padding:8px 14px;display:flex;align-items:center;gap:12px;border-top:1px solid var(--line)}
+.lb li:first-child{border-top:0}
+.lb li.me{background:color-mix(in srgb,var(--violet) 18%,var(--raised))}
+.lb li.gap{min-height:28px;justify-content:center;color:var(--muted);font-size:13px;padding:2px}
+.lb .rk{width:28px;flex:0 0 28px;text-align:center;font-family:var(--px);font-size:14px;color:var(--muted)}
+.lb .rk.r1{color:var(--coin)}.lb .rk.r2{color:#C9C3D1}.lb .rk.r3{color:#E0915A}
+:root[data-theme=light] .lb .rk.r1{color:#9A7400}:root[data-theme=light] .lb .rk.r2{color:#6E6878}:root[data-theme=light] .lb .rk.r3{color:#A0521C}
+.lb .nm{flex:1;min-width:0;font-size:15px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lb .nm small{font-size:12px;color:var(--vtext);margin-left:6px}
+.lb .sc{font-family:var(--px);font-size:14px;white-space:nowrap}
+.lb .lb-k{font-size:13px;color:var(--muted);margin:0 0 10px}
+.lb .lb-n{font-size:13px;color:var(--muted);margin-top:10px}
+.lb .lb-n a{color:var(--vtext)}
+.lb sup,.mg-rk sup{font-size:.65em;vertical-align:.45em;line-height:0}
 </style>
 </head>
 <body>
@@ -733,6 +753,8 @@ for(const k in GAMES){const g=GAMES[k];
  </div>
  <h2 class="px s">Comment ça marche</h2>
  <div class="steps">${g.steps.map((s,i)=>`<div class="step"><b>0${i+1}</b><h3>${s[0]}</h3><p>${s[1]}</p></div>`).join('')}</div>
+ <h2 class="px s" id="classement-${k}">Classement</h2>
+ <div class="lb" data-lb="${k}"></div>
  <h2 class="px s" id="avis-${k}">Avis des joueurs</h2>
  <div class="rv-zone"><div class="rv-left"><div class="rv-sum" data-sum="${k}"></div><div data-form="${k}"></div></div><div class="rv-list" data-list="${k}"></div></div>
  <h2 class="px s">Fiche du jeu</h2>
@@ -897,7 +919,7 @@ document.addEventListener('click',async e=>{
 if(S.sb){
  S.sb.auth.onAuthStateChange((ev,session)=>{
   S.session=session;
-  setTimeout(async()=>{await loadProfile();S.authReady=true;if(uid())loadMine();else Object.assign(M,{games:null,reviews:[],edit:false,ava:null,del:false});drawAccount();if((location.hash||'').startsWith('#admin'))openAdmin();drawAllReviews();Object.keys(GAMES).forEach(k=>{if(S.loaded[k])loadReviews(k)});
+  setTimeout(async()=>{await loadProfile();S.authReady=true;if(uid())loadMine();else Object.assign(M,{games:null,reviews:[],edit:false,ava:null,del:false});drawAccount();if((location.hash||'').startsWith('#admin'))openAdmin();{const jh=(location.hash||'').slice(1);if(jh.startsWith('jeu-')&&GAMES[jh.slice(4)])loadBoard(jh.slice(4))}drawAllReviews();Object.keys(GAMES).forEach(k=>{if(S.loaded[k])loadReviews(k)});
    if(ev==='SIGNED_IN'){S.login={step:'email',email:'',busy:false,msg:null};let fromLink=false;try{fromLink=sessionStorage.getItem('iig-login')==='1';sessionStorage.removeItem('iig-login')}catch(_){}if(fromLink&&location.hash!=='#compte')location.hash='#compte'}
    const nc=$('#nav-compte');if(nc)nc.textContent=uid()?(S.profile?.display_name||'Compte').slice(0,16):'COMPTE';
   },0);
@@ -1083,9 +1105,10 @@ function avaSvg(id,size){
 }
 /* progression lue dans la sauvegarde en ligne de chaque jeu */
 const PROG={
+ slime:d=>[['Meilleure hauteur',LBF.slime.fmt(d.best||0)],['Pièces',nf(d.coins||0)]],
  ntd:d=>{const n=d&&d.M&&d.M.niv||{};const sous=Object.values(n).reduce((a,v)=>a+Math.min(10,Number(v&&v.sous)||0),0);return[['Niveaux finis',sous+' / 50'],['Record',nf(d.record||0)+' or']]}
 };
-const M={saves:{},games:null,reviews:[],err:false,edit:false,ava:null,busy:false,msg:null,del:false,delBusy:false,delErr:null,expBusy:false};
+const M={ranks:{},saves:{},games:null,reviews:[],err:false,edit:false,ava:null,busy:false,msg:null,del:false,delBusy:false,delErr:null,expBusy:false};
 
 async function loadMine(){
  if(!S.sb||!uid())return;
@@ -1095,6 +1118,7 @@ async function loadMine(){
   S.sb.from('saves').select('game_id,updated_at,data').eq('user_id',uid())
  ]).then(a=>{M.saves={};(a[2].data||[]).forEach(x=>M.saves[x.game_id]=x);return a});
  M.err=!!(g.error||r.error);
+ const rk=await Promise.all(Object.keys(GAMES).map(k=>myRank(GAMES[k].db)));M.ranks={};Object.keys(GAMES).forEach((k,i)=>{if(rk[i])M.ranks[GAMES[k].db]=rk[i]});
  M.games={};(g.data||[]).forEach(x=>M.games[x.game_id]=x);
  M.reviews=r.data||[];
  if((location.hash||'#')==='#compte')drawAccount();
@@ -1119,9 +1143,10 @@ function drawMyGames(){
   const sub=s&&s.launches?`${nf(s.launches)} partie${s.launches>1?'s':''} · dernière ${ago(s.last_at)}${s.play_s?' · '+dur(s.play_s)+' de jeu':''}`:'Pas encore joué avec ton compte';
   const note=rv?`<span class="mine">Ta note ${starRow(rv.rating)}</span>`:`<a href="#jeu-${k}">Donner ma note</a>`;
   const sv=M.saves[g.db],pr=sv&&PROG[g.db]?PROG[g.db](sv.data):null;
-  const cells=pr?`<dl class="mg-dl">${pr.map(([t,v])=>`<div><dt>${t}</dt><dd>${esc(v)}</dd></div>`).join('')}</dl><p class="mg-sv">Sauvegardé en ligne ${ago(sv.updated_at)}</p>`:'';
+  const rkk=M.ranks[g.db];
+  const cells=(pr?`<dl class="mg-dl">${pr.map(([t,v])=>`<div><dt>${t}</dt><dd>${esc(v)}</dd></div>`).join('')}</dl>`:'')+(rkk?`<a class="mg-rk" href="#classement-${k}">Classement : <b>${ord(rkk.rank)}</b> sur ${rkk.total}<span aria-hidden="true">›</span></a>`:'')+(sv?`<p class="mg-sv">Sauvegardé en ligne ${ago(sv.updated_at)}</p>`:'');
   return `<article><div class="hd"><img src="${IMG[g.icon]}" alt=""><div><h3>${esc(g.name)}</h3><p>${sub}</p></div></div>${cells}<div class="ft">${note}<a class="btn sm" href="#lancement-${k}">${pi('play')}JOUER</a></div></article>`}).join('')}</div>
- <p class="note">Tes parties sont comptées quand tu joues connecté. Nine Tiles Dungeon sauvegarde ta progression sur ton compte : tu la retrouves sur tous tes appareils. Les autres jeux suivent bientôt.</p>`;
+ <p class="note">Tes parties sont comptées quand tu joues connecté. Les jeux sauvegardent ta progression sur ton compte : tu la retrouves sur tous tes appareils.</p>`;
 }
 
 function drawLoggedIn(el){
@@ -1197,6 +1222,42 @@ document.addEventListener('click',e=>{
 });
 document.addEventListener('submit',e=>{if(e.target.id==='prof-f'){e.preventDefault();saveProfile()}});
 
+// ---- Classements (calculés depuis la sauvegarde en ligne)
+const LBF={ntd:{what:"Record d'or en une seule descente",fmt:v=>nf(v)+' or'},slime:{what:'Meilleure hauteur atteinte',fmt:v=>Number(v).toLocaleString('fr-FR',{minimumFractionDigits:1,maximumFractionDigits:1})+' m'}};
+const ord=n=>n===1?'1<sup>er</sup>':n+'<sup>e</sup>';
+const LB={};
+async function myRank(db){
+ if(!uid())return null;
+ const {data}=await S.sb.from('scores').select('score').eq('game_id',db).eq('user_id',uid()).maybeSingle();
+ if(!data)return null;
+ const [a,t]=await Promise.all([
+  S.sb.from('scores').select('user_id',{count:'exact',head:true}).eq('game_id',db).gt('score',data.score),
+  S.sb.from('scores').select('user_id',{count:'exact',head:true}).eq('game_id',db)
+ ]);
+ return {score:data.score,rank:(a.count||0)+1,total:t.count||1};
+}
+async function loadBoard(k){
+ if(!S.sb)return;
+ const db=GAMES[k].db;
+ const [top,me]=await Promise.all([
+  S.sb.from('scores').select('user_id,score,updated_at,profiles(display_name,avatar)').eq('game_id',db).order('score',{ascending:false}).order('updated_at',{ascending:true}).limit(10),
+  myRank(db)
+ ]);
+ LB[k]={top:top.data||[],err:!!top.error,me};drawBoard(k);
+}
+function drawBoard(k){
+ const el=$(`[data-lb="${k}"]`);if(!el)return;
+ const b=LB[k],f=LBF[GAMES[k].db]||{what:'',fmt:v=>v};
+ if(!b){el.innerHTML='<p class="lb-k">Chargement…</p>';return}
+ if(b.err){el.innerHTML='<p class="lb-k">Le classement ne répond pas pour l\'instant.</p>';return}
+ const row=(r,rank)=>{const mine=r.user_id===uid();return `<li class="${mine?'me':''}"><span class="rk${rank<=3?' r'+rank:''}">${rank}</span>${avaSvg(r.profiles?.avatar,26)}<span class="nm">${esc(r.profiles?.display_name||'Joueur')}${mine?'<small>toi</small>':''}</span><span class="sc">${f.fmt(r.score)}</span></li>`};
+ let rk=0,prev=null;const rows=b.top.map((r,i)=>{if(r.score!==prev){rk=i+1;prev=r.score}return row(r,rk)}).join('');
+ const inTop=b.top.some(r=>r.user_id===uid());
+ const meRow=b.me&&!inTop?`<li class="gap" aria-hidden="true">···</li><li class="me"><span class="rk">${b.me.rank}</span>${avaSvg(S.profile?.avatar,26)}<span class="nm">${esc(S.profile?.display_name||'Toi')}<small>toi</small></span><span class="sc">${f.fmt(b.me.score)}</span></li>`:'';
+ const note=!uid()?`<a href="#compte">Connecte-toi</a> et joue pour entrer au classement.`:!b.me?'Joue connecté : ton meilleur score apparaîtra ici.':`Tu es ${ord(b.me.rank)} sur ${b.me.total}.`;
+ el.innerHTML=`<p class="lb-k">${f.what}</p>${b.top.length?`<ol>${rows}${meRow}</ol>`:'<p class="adm-empty">Personne au classement pour l\'instant. Sois le premier !</p>'}<p class="lb-n">${note}</p>`;
+}
+
 // navigation
 let timer=null,prev='';
 function setTab(t){
@@ -1220,7 +1281,7 @@ function show(){
  let view=h,scroll=null,tab=h;
  if(h==='jeux'){view='accueil';scroll='#jeux-section'}
  if(h==='studio'){view='accueil';scroll='#studio-section'}
- if(h.startsWith('jeu-')){tab='jeux';const gk=h.slice(4);if(GAMES[gk])loadReviews(gk)}
+ if(h.startsWith('jeu-')){tab='jeux';const gk=h.slice(4);if(GAMES[gk]){loadReviews(gk);loadBoard(gk)}}
  if(h==='compte'){drawAccount();loadMine()}
  if(h==='admin'||h.startsWith('admin-')){view='admin';tab='admin';openAdmin()}
  if(h.startsWith('installer-')&&TARGETS[h.slice(10)]){target=h.slice(10);view='installer'}
